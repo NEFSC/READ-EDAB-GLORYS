@@ -80,9 +80,9 @@ make_monthly_gridded = function(input.dir, input.prefix, output.dir, output.pref
   }
 }
 
-make_monthly_gridded(input.dir = 'C:/Users/joseph.caracappa/Documents/Data/GLORYS/Daily_Bottom_Temp/2024/',
-                     input.prefix = 'GLORYS_REANALYSIS_',
-                     output.dir = 'C:/Users/joseph.caracappa/Documents/Data/GLORYS/GLORYS_monthly/',
-                     output.prefix = 'GLORYS_monthly_BottomTemp_',
-                     var.name = 'thetao',
-                     statistics = c('mean','median','sd'))
+# make_monthly_gridded(input.dir = 'C:/Users/joseph.caracappa/Documents/Data/GLORYS/Daily_Bottom_Temp/2024/',
+#                      input.prefix = 'GLORYS_REANALYSIS_',
+#                      output.dir = 'C:/Users/joseph.caracappa/Documents/Data/GLORYS/GLORYS_monthly/',
+#                      output.prefix = 'GLORYS_monthly_BottomTemp_',
+#                      var.name = 'thetao',
+#                      statistics = c('mean','median','sd'))

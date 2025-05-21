@@ -66,12 +66,4 @@ make_gridded_climatology = function(input.dir,
   }
 }
 
-# make_gridded_climatology(input.dir = 'C:/Users/joseph.caracappa/Documents/Data/GLORYS/GLORYS_daily/',
-#                      input.prefix = 'GLORYS_daily_BottomTemp_',
-#                      output.file = here::here('data-raw','GLORYS_bottom_temp_clim_1990_2020.csv'),
-#                      shp.file = here::here('data-raw','geometry','EPU_NOESTUARIES.shp'),
-#                      write.out = T,
-#                      ref.year.start = 1990,
-#                      ref.year.end = 2020,
-#                      agg.time = 'season',
-#                      var.name = 'bottomT')
+

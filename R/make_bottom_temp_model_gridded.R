@@ -35,9 +35,9 @@ make_bottom_temp_model_gridded = function(input.file,
                                          agg.time = 'season',
                                          statistic = 'mean',
                                          area.names = c('MAB','GB','GOM','SS')
-  )
+  )[[1]]
   
-  glorys.season.mean =terra::as.data.frame(glorys.season,xy =T)
+  glorys.season.mean =terra::as.data.frame(terra::rast(glorys.season),xy =T)
   colnames(glorys.season.mean) = c('Longitude','Latitude','winter','spring','summer','fall')[1:ncol(glorys.season.mean)]
   glorys.season.mean = glorys.season.mean %>%
       tidyr::gather(Var,Value,-Longitude,-Latitude)%>%

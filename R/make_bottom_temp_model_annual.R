@@ -32,6 +32,7 @@ make_bottom_temp_model_annual = function(input.file,
                                                      agg.time = 'days',
                                                      statistic = 'mean',
                                                      touches =F,
+                                                     file.time = 'annual',
                                                      area.names = c('MAB','GB','GOM','SS')
   )
   
@@ -49,15 +50,15 @@ make_bottom_temp_model_annual = function(input.file,
       select(Time,Value,EPU,Source,Var,Units)
   
   if(write.out){
-    write.csv(data.all.mean, out.file,row.names =F)  
+    write.csv(data.all.mean, output.file,row.names =F)  
   }else{
     return(data.all.mean)
   }
 }
   
-make_bottom_temp_annual(input.file = 'C:/Users/joseph.caracappa/Documents/Data/GLORYS/GLORYS_daily/GLORYS_daily_BottomTemp_2024.nc',
-                        output.file = here::here('data','GLORYS','bottom_temp_test.nc'),
-                        shp.file = here::here('geometry','EPU_NOESTUARIES.shp'),
-                        file.year = 2024,
-                        climatology.file =  here::here('data','GLORYS','GLORYS_bottom_temp_clim_1990_2020.csv')
-)
+# make_bottom_temp_annual(input.file = 'C:/Users/joseph.caracappa/Documents/Data/GLORYS/GLORYS_daily/GLORYS_daily_BottomTemp_2024.nc',
+#                         output.file = here::here('data','GLORYS','bottom_temp_test.nc'),
+#                         shp.file = here::here('geometry','EPU_NOESTUARIES.shp'),
+#                         file.year = 2024,
+#                         climatology.file =  here::here('data','GLORYS','GLORYS_bottom_temp_clim_1990_2020.csv')
+# )
