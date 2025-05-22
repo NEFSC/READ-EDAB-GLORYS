@@ -40,22 +40,22 @@ make_bottom_temp_model_anom = function(input.file,
                                                         area.names = c('MAB','GB','GOM','SS')
   )
   
-  glorys.season.epu = mutate(glorys.season.epu[[1]], year = file.year, Var = 'GLORYS')
+  glorys.season.epu = dplyr::mutate(glorys.season.epu[[1]], year = file.year, Var = 'GLORYS')
   
   glorys.anom.clim = read.csv(climatology.file)
 
   data.all.anom = glorys.season.epu %>%
-    left_join(glorys.anom.clim)%>%
-    rename(Source = 'Var')%>%
-    mutate(value.anom = value-value.clim)%>%
-    left_join(season.match,by = c('time'= 'season.id')) %>%
-    mutate(dum = '_Bottom Temp Anomaly')%>%
+    dplyr::left_join(glorys.anom.clim)%>%
+    dplyr::rename(Source = 'Var')%>%
+    dplyr::mutate(value.anom = value-value.clim)%>%
+    dplyr::left_join(season.match,by = c('time'= 'season.id')) %>%
+    dplyr::mutate(dum = '_Bottom Temp Anomaly')%>%
     tidyr::unite(Var,c('season.name','dum'),sep='')%>%
-    rename(Time = 'year',
+    dplyr::rename(Time = 'year',
            EPU = 'area',
            Value = 'value.anom')%>%
-    mutate(Units = 'degree C')%>%
-    select(Time, Value, EPU, Source, Var, Units)
+    dplyr::mutate(Units = 'degree C')%>%
+    dplyr::select(Time, Value, EPU, Source, Var, Units)
   
   if(write.out){
     write.csv(data.all.anom,output.file,row.names = F)

@@ -37,17 +37,17 @@ make_bottom_temp_model_annual = function(input.file,
   )
   
   data.all.mean = glorys.epu.day[[1]] %>%
-      mutate(year = format(as.Date(time),format = '%Y'))%>%
-      group_by(year,area)%>%
-      summarise(Value = mean(value,na.rm=T))%>%
-      mutate(source = 'GLORYS') %>%
-      rename(Time = 'year',
+    dplyr::mutate(year = format(as.Date(time),format = '%Y'))%>%
+    dplyr::group_by(year,area)%>%
+    dplyr::summarise(Value = mean(value,na.rm=T))%>%
+    dplyr::mutate(source = 'GLORYS') %>%
+    dplyr::rename(Time = 'year',
            EPU = 'area',
            Source = 'source')%>%
-      mutate(Var = 'Annual_Bottom Temp',
+    dplyr::mutate(Var = 'Annual_Bottom Temp',
            Units = 'degree C',
            Time = as.numeric(Time))%>%
-      select(Time,Value,EPU,Source,Var,Units)
+    dplyr::select(Time,Value,EPU,Source,Var,Units)
   
   if(write.out){
     write.csv(data.all.mean, output.file,row.names =F)  

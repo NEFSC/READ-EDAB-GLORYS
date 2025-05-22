@@ -7,6 +7,7 @@
 make_thermal_habitat_gridded(
   input.file,
   output.file,
+  supp.dir,
   shp.file,
   file.year,
   t.max.seq,
@@ -17,6 +18,8 @@ make_thermal_habitat_gridded(
 \item{input.file}{Either a character vector of full input file names for a list of spatrasters}
 
 \item{output.file}{character vector of full output file names corresponding to each input file}
+
+\item{supp.dir}{character vector of the directory where the input files are located}
 
 \item{shp.file}{string. Shape file you wish to crop each input file to}
 

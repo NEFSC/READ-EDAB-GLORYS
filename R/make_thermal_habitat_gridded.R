@@ -4,6 +4,7 @@
 #'
 #' @param input.file Either a character vector of full input file names for a list of spatrasters
 #' @param output.file character vector of full output file names corresponding to each input file
+#' @param supp.dir character vector of the directory where the input files are located
 #' @param shp.file  string. Shape file you wish to crop each input file to
 #' @param file.year numeric. Year of the input file
 #' @param write.out logical. If TRUE, the function will write out the gridded data to a netcdf file
@@ -16,7 +17,7 @@
 #' @export
 #' 
 
-make_thermal_habitat_gridded = function(input.file, output.file, shp.file, file.year,t.max.seq, write.out =F){
+make_thermal_habitat_gridded = function(input.file, output.file,supp.dir, shp.file, file.year,t.max.seq, write.out =F){
   
   EPU.names = c('MAB','GB','GOM','SS')
   depth.df = data.frame(id = 1:4,
@@ -25,9 +26,9 @@ make_thermal_habitat_gridded = function(input.file, output.file, shp.file, file.
                         depth.name = c('0-25m','25-100m','100-300m','300+'))
   
     combs = expand.grid(depth.name = depth.df$depth.name,EPU = EPU.names,stringsAsFactors = F)%>%
-    left_join(depth.df) 
+    dplyr::left_join(depth.df) 
  
-  bathy.shp = terra::rast(here::here('data-raw','GLORYS','GLORYS_bathymetry_east_coast_crop.nc'),subds = 'deptho')
+  bathy.shp = terra::rast(paste0(supp.dir,'GLORYS/GLORYS_bathymetry_east_coast_crop.nc'),subds = 'deptho')
 
   #create EPU mask layer
   EPU.vect = terra::vect(shp.file)
@@ -104,9 +105,9 @@ make_thermal_habitat_gridded = function(input.file, output.file, shp.file, file.
   terra::writeCDF(out.var,filename = output.file,overwrite =T,missval = 0)
   
   #Format netcdf
-  var.atts = read.csv(here::here('data-raw','GLORYS','thermal_habitat_gridded_variable_attributes.csv')) %>%
+  var.atts = read.csv(paste0(supp.dir,'GLORYS/thermal_habitat_gridded_variable_attributes.csv')) %>%
     filter(!is.na(Value) & Attribute.Name != '_FillValue')
-  global.atts = read.csv(here::here('data-raw','GLORYS','thermal_habitat_gridded_global_attributes.csv'))%>%
+  global.atts = read.csv(paste0(supp.dir,'GLORYS/thermal_habitat_gridded_global_attributes.csv'))%>%
     filter(!is.na(Value))
   
   file.nc = ncdf4::nc_open(output.file,write =T)
