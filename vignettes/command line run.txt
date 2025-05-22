@@ -1,0 +1,1 @@
+Rscript vignettes/make_GLORYS_bt_soe.R "/c/Users/joseph.caracappa/Documents/Data/GLORYS/GLORYS_daily/" "/c/Users/joseph.caracappa/Documents/GitHub/READ_EDAB_GLORYS/data-raw/" "/c/Users/joseph.caracappa/Documents/GitHub/READ_EDAB_GLORYS/"
