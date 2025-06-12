@@ -2,5 +2,4 @@
 .Rproj.user
 
 data-raw/GLORYS/GLO-MFC_001_024_mask_bathy.nc
-data/GLORYS/*
-data/ROMS/*
+data/*
