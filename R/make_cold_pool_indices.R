@@ -6,7 +6,7 @@
 #' @param cp.extent.file Full input file directory for cold pool extent data returned from make_cold_pool_extent
 #' @param output.dir Full output file directory
 #' 
-#' @return RDS file with the processed data for GLORYS and ROMS
+#' @return csv with cold pool indices
 #' 
 #' @importFrom magrittr "%>%"
 #' 

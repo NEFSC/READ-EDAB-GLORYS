@@ -1,4 +1,4 @@
-#' Createst the thermal_habitat_gridded inidcator for the State of the Ecosystem Report
+#' Formats data for cold pool analysis
 #'
 #' descriptions
 #'
@@ -51,7 +51,7 @@ make_cold_pool_data = function(input.files, output.dir,output.prefix,cp.shp.file
   }
   
   glorys.df = dplyr::bind_rows(data.df.ls)
-  saveRDS(glorys.df,paste0(output.dir,output.prefix,'_monthly_',file.years[1],'_',file.years[length(file.years)],'.rds'))
+  saveRDS(glorys.df,paste0(output.dir,output.prefix,'monthly_',file.years[1],'_',file.years[length(file.years)],'.rds'))
   
   
 }

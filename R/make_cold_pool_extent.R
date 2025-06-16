@@ -7,7 +7,7 @@
 #' @param shp.file  string. Shape file you wish to crop each input file to
 #' @param grid.file Full input file directory for the cold pool grid file
 #' 
-#' @return RDS file with the processed data for GLORYS and ROMS
+#' @return RDS file with the annual and maximum cold pool extent
 #' 
 #' @importFrom magrittr "%>%"
 #' 
