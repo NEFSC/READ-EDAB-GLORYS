@@ -125,7 +125,7 @@ for(y in 1:length(run.years)){
                                               shp.file = shp.file,
                                               file.year = run.years[y],
                                               write.out =T,
-                                              t.max.seq = seq(0,1,0.5)
+                                              t.max.seq = seq(0,30,1)
     )
   }
   
@@ -145,7 +145,7 @@ for(y in 1:length(run.years)){
                                            file.year = run.years[y],
                                            write.area =T,
                                            write.gridded =T,
-                                           t.max.seq = seq(0,1,0.5)
+                                           t.max.seq = seq(0,30,1)
     )
   }
 }
