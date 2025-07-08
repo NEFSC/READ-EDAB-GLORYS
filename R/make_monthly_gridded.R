@@ -28,10 +28,10 @@ make_monthly_gridded = function(input.dir, input.prefix, output.dir, output.pref
   
   #Get current date
   current.date = Sys.Date()
-  # current.month = format(current.date, '%m')
-  # current.year = format(current.date, '%Y')
-  current.year = '2024'
-  current.month = '12'
+  current.month = format(current.date, '%m')
+  current.year = format(current.date, '%Y')
+  #current.year = '2024'
+  #current.month = '12'
   last.month = as.numeric(current.month) - 1
   
   #Find the first month/year in the input files
