@@ -1,7 +1,7 @@
 
 source(here::here('data-raw','format_ROMS_coldpool.R'))
 
-make_cold_pool_data(input.files = list.files('C:/Users/joseph.caracappa/Documents/Data/GLORYS/GLORYS_daily/','GLORYS_daily_BottomTemp_',full.names = T),
+EDAB.GLORYS::make_cold_pool_data(input.files = list.files('C:/Users/joseph.caracappa/Documents/Data/GLORYS/GLORYS_daily/','GLORYS_daily_BottomTemp_',full.names = T),
                     output.dir = here::here('data','cold_pool','GLORYS','/'),
                     output.prefix = 'glorys_cold_pool_',
                     cp.shp.file = here::here('data-raw','geometry','cold_pool_area_GLORYS.shp')
