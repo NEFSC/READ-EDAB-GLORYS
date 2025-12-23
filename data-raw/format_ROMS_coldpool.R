@@ -1,8 +1,8 @@
 #Formats a static debiased ROMS bottom temperature for cold pool indices 
 
-roms.file = 'C:/Users/joseph.caracappa/Documents/GitHub/bottom_temp_SOE/data/ROMS/bottom_temp_debiased_roms_reg112_1959_2004.nc'
+roms.file = '/home/jcaracappa/EDAB_Datasets/ROMS_NWA/bottom_temp_debiased_roms_reg112_1959_2004.nc'
 roms.years = 1959:1992
-output.dir = here::here('data','cold_pool','ROMS','/')
+output.dir = '/home/jcaracappa/EDAB_Dev/jcaracappa/glorys_soe/data/cold_pool/ROMS/'
 
 cp.shp = terra::vect(here::here('data-raw','geometry','cold_pool_area.shp'))
 #Get ROMS data
@@ -27,13 +27,14 @@ roms.crop = roms.rast %>%
   terra::mask(cp.shp)
 terra::varnames(roms.crop) = 'BottomT'
 names(roms.crop) = terra::time(roms.crop)
+# terra::depth(roms.crop) = NULL
 
 terra::writeCDF(roms.crop,varname = 'BottomT',filename=paste0(output.dir,'roms_debiased_cold_pool_',roms.years[1],'_',roms.years[length(roms.years)],'.nc'),overwrite =T)
 
 #convert a layer of roms.crop to a supplemental cold pool grid file
 roms.grid = terra::subset(roms.crop,1)
 terra::values(roms.grid) = NA
-terra::writeCDF(roms.grid,varname = 'BottomT',filename=here::here('data','cold_pool','roms_cold_pool_grid.nc'),overwrite =T)
+terra::writeCDF(roms.grid,varname = 'BottomT',filename=paste0(output.dir,'roms_cold_pool_grid.nc'),overwrite =T)
 
 roms.df = terra::as.data.frame(roms.crop,cell = T)%>%
   tidyr::gather(date,value,-cell)%>%
