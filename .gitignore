@@ -2,6 +2,6 @@
 .Rproj.user
 
 data-raw/GLORYS/GLO-MFC_001_024_mask_bathy.nc
-/data/*
-!/data/cold_pool/ROMS/*
+/data/
+!/data/cold_pool/ROMS/
 
