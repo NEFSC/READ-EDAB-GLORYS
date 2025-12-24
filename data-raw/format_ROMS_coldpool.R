@@ -1,17 +1,27 @@
 #Formats a static debiased ROMS bottom temperature for cold pool indices 
+library(terra)
+library(dplyr)
 
-roms.file = '/home/jcaracappa/EDAB_Datasets/ROMS_NWA/bottom_temp_debiased_roms_reg112_1959_2004.nc'
+roms.file =  here::here('data-raw','ROMS_temp.nc')#'W:/ROMS_NWA/bottom_temp_debiased_roms_reg112_1959_2004.nc'
 roms.years = 1959:1992
-output.dir = '/home/jcaracappa/EDAB_Dev/jcaracappa/glorys_soe/data/cold_pool/ROMS/'
+output.dir = 'X:/jcaracappa/glorys_soe/data/cold_pool/ROMS/'
 
+copy.first =T
+if(copy.first == T){
+  temp.roms.file = here::here('data-raw','ROMS_temp.nc')
+  if(!file.exists(temp.roms.file)){
+    file.copy(roms.file,temp.roms.file,overwrite = T)
+  }
+  roms.file = temp.roms.file
+}
 cp.shp = terra::vect(here::here('data-raw','geometry','cold_pool_area.shp'))
 #Get ROMS data
 roms.rast = terra::rast(roms.file)
 roms.names = terra::names(roms.rast)
 #Get first number from roms.names
-roms.day = as.numeric(sub('^[^0-9]+([0-9]+).*', '\\1', roms.names))
-roms.year = as.numeric(sub('.*=([0-9]{4})$', '\\1', roms.names))
-roms.date = as.Date(paste(roms.year, roms.day), format = "%Y %j")
+roms.year = as.numeric(sub(".*year=(\\d{4}).*", "\\1", roms.names))
+roms.day = as.numeric(sub(".*day=(\\d{1,3}).*", "\\1", roms.names))
+roms.date = as.Date(paste(roms.year, roms.day,sep = '-'), format = "%Y-%j")
 
 #Remove incorrect leap days and not within time period
 roms.rm = is.na(roms.date) | roms.year< roms.years[1] | roms.year > roms.years[length(roms.years)]
@@ -22,9 +32,24 @@ roms.date = roms.date[!roms.rm]
 terra::time(roms.rast) = roms.date
 
 #Crop and mask to cp.shp
-roms.crop = roms.rast %>%
-  terra::crop(cp.shp) %>%
-  terra::mask(cp.shp)
+cp.ext = terra::ext(cp.shp)
+cp.pad = c(ceiling(terra::xmin(cp.ext)),
+           ceiling(terra::ymax(cp.ext)),
+           floor(terra::xmax(cp.ext)),
+           floor(terra::ymin(cp.ext)))
+temp.crop.file = here::here('data-raw','ROMS_temp_cropped.nc')
+if(file.exists(temp.crop.file)){
+  file.remove(temp.crop.file)
+}
+gdalUtilities::gdal_translate(
+  src_dataset = roms.file,
+  dst_dataset = temp.crop.file,
+  projwin = cp.pad,
+  of = 'NetCDF'
+)
+
+# roms.crop = terra::mask(terra::crop(roms.rast,cp.shp),cp.shp)
+roms.crop = terra::rast(here::here('data-raw','ROMS_temp_cropped.nc'))
 terra::varnames(roms.crop) = 'BottomT'
 names(roms.crop) = terra::time(roms.crop)
 # terra::depth(roms.crop) = NULL

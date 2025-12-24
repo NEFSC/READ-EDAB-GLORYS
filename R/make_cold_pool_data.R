@@ -14,7 +14,7 @@
 #' @export
 #' 
 
-make_cold_pool_data = function(input.files, output.dir,output.prefix,cp.shp.file){
+make_cold_pool_data = function(input.files, output.dir,output.prefix,cp.shp.file,redo =F){
 
   #Read cold pool detection area shape file
   cp.shp  = terra::vect(cp.shp.file)
@@ -23,6 +23,10 @@ make_cold_pool_data = function(input.files, output.dir,output.prefix,cp.shp.file
   data.ls = list()
   data.df.ls = list()
   file.years = numeric()
+  
+  if(redo == F){
+    input.files = input.files[!file.exists(input.files)]
+  }
   for(i in 1:length(input.files)){
     
     input.file = paste0(input.files[i])
