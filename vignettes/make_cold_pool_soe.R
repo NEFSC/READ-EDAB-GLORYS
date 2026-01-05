@@ -1,28 +1,27 @@
 
 # source(here::here('data-raw','format_ROMS_coldpool.R'))
-glorys.files = list.files('W:/GLORYS/glorys_bottomT/cmems_mod_glo_phy_my_0.083deg_P1D-m/bottomT_NEUS/',full.names =T)
+glorys.files = list.files('/home/jcaracappa/EDAB_Datasets/GLORYS/glorys_bottomT/cmems_mod_glo_phy_my_0.083deg_P1D-m/bottomT_NEUS/',full.names =T)
 EDAB.GLORYS::make_cold_pool_data(
                     # input.files = list.files('C:/Users/joseph.caracappa/Documents/Data/GLORYS/GLORYS_daily/','GLORYS_daily_BottomTemp_',full.names = T),
                     input.files = glorys.files,
-                    output.dir = 'X:/jcaracappa/glorys_my_soe/data/cold_pool/',
+                    output.dir = '/home/jcaracappa/EDAB_Dev/jcaracappa/glorys_my_soe/data/cold_pool/',
                     output.prefix = 'glorys_cold_pool_',
-                    cp.shp.file = here::here('data-raw','geometry','cold_pool_area_GLORYS.shp'),
-                    redo=T
+                    cp.shp.file = here::here('data-raw','geometry','cold_pool_area_GLORYS.shp')
 )
 
-glorys.data = readRDS('X:/jcaracappa/glorys_my_soe/data/cold_pool/glorys_cold_pool_monthly_1993_2025.rds') |> 
+glorys.data = readRDS(here::here('data','cold_pool','GLORYS','glorys_cold_pool_monthly_1993_2024.rds')) %>%
   dplyr::mutate(source = 'GLORYS')
-roms.data = readRDS('X:/jcaracappa/glorys_soe/data/cold_pool/ROMS/roms_debiased_cold_pool_monthly_1959_1992.rds') |> 
+roms.data = readRDS(here::here('data','cold_pool','ROMS','roms_debiased_cold_pool_monthly_1959_1992.rds'))%>%
   dplyr::mutate(source = 'ROMS')
 input.data = dplyr::bind_rows(glorys.data,roms.data)
 rm(glorys.data,roms.data)
 
 make_cold_pool_extent(input.data = input.data,
-                      output.dir = 'V:/',
+                      output.dir = here::here('data','cold_pool','/'),
                       shp.file = here::here('data-raw','geometry','cold_pool_area.shp'),
                       grid.file = here::here('data','cold_pool','roms_cold_pool_grid.nc')
 )
 make_cold_pool_indices(input.data = input.data,
-                       cp.extent.file = 'V:/cold_pool_maximum_extent_1959_2025.rds',
-                       output.dir = 'V:/'
+                       cp.extent.file = here::here('data','cold_pool','cold_pool_maximum_extent_1959_2024.rds'),
+                       output.dir = here::here('data','cold_pool','/')
 )

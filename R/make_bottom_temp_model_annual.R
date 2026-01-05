@@ -32,7 +32,7 @@ make_bottom_temp_model_annual = function(input.file,
                                                      agg.time = 'days',
                                                      statistic = 'mean',
                                                      touches =F,
-                                                     file.time = 'annual',
+                                                     file.time = 'daily',
                                                      area.names = c('MAB','GB','GOM','SS')
   )
   

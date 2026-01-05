@@ -14,20 +14,30 @@ if(length(args)>0){
   output.dir = '/home/jcaracappa/EDAB_Dev/jcaracappa/glorys_my_soe/'
   # supp.dir = 'C:/Users/joseph.caracappa/Documents/GitHub/READ_EDAB_GLORYS/data-raw/'
   supp.dir = '/home/jcaracappa/EDAB_Resources/workflow_resources/'
+  indicator.dir = '/home/jcaracappa/EDAB_Indicators/'
   
   print('Using default arguments')
 }
 shp.file = paste0(supp.dir,'shapefiles/EPU_NOESTUARIES.shp')
 
 #Get year range
-year.start = 1993
+year.start = 2007
 year.end = format(Sys.time(), '%Y')
 run.years = year.start:year.end
 y=1
 input.prefix = 'GLORYS_REANALYSIS_DAILY_cmems_mod_glo_phy_my_0.083deg_P1D-m_bottomT_NEUS_'
 input.files = list.files(input.dir,input.prefix)
 input.files.year = as.numeric(gsub(".*(\\d{4}).*", '\\1', input.files))
-no.threshold =F
+
+redo = T
+do.model.anom = T
+do.model.annual = F
+do.model.gridded = F
+do.daily.epu = F
+do.thermal.area = F
+do.thermal.gridded = F
+
+report.year = 2025
 
 check.dir = function(file){
   if(!dir.exists(dirname(file))){dir.create(dirname(file),recursive =T)}
@@ -72,22 +82,24 @@ for(y in 1:length(run.years)){
   
   which.files.year = which(input.files.year == run.years[y])
   if(length(which.files.year) == 0){
+    message('no files in this year')
     next()
   }
   
   this.year.files = paste0(input.dir,input.files[which.files.year])
   if(any(file.size(this.year.files)==0)){
+    message('some files have zero size')
     next()
   }
   
-  if(all(!file.exists(this.year.files))){
+  if(all(!file.exists(this.year.files)) & run.years[y] != report.year){
     print(paste0('File does not exist: ',this.year.file))
     next()
   }
   
   year.dates = seq.Date(as.Date(paste0(run.years[y],'-01-01')), as.Date(paste0(run.years[y],'-12-31')), by = '1 day')
   file.dates <- sub(".*(\\d{4}-\\d{2}-\\d{2}).*", "\\1", this.year.files)
-  if(!all(year.dates %in% file.dates)){
+  if(!all(year.dates %in% file.dates)& run.years[y] != report.year){
     print(paste0('Missing Dates in ',run.years[y],': ', paste0(year.dates[which(!(year.dates %in% file.dates))],collapse = ', ')))
     next()
   }
@@ -97,9 +109,9 @@ for(y in 1:length(run.years)){
   
   output.file3 = paste0(output.dir,'data/bottom_temp_model_gridded/GLORYS_bottom_temp_model_gridded_',run.years[y],'.csv')
   check.dir(output.file3)
-  if(file.exists(output.file3)){
+  if(file.exists(output.file3) & redo == F){
     print(paste0('File already exists: ',output.file3))
-  }else{
+  }else if(do.model.gridded == T){
     EDAB.GLORYS::make_bottom_temp_model_gridded(input.file = this.year.files,
                                                 output.file = output.file3,
                                                 shp.file = shp.file,
@@ -113,9 +125,9 @@ for(y in 1:length(run.years)){
   
   output.file4 = paste0(output.dir,'data/bottom_temp_model_anom/GLORYS_bottom_temp_model_anom_',run.years[y],'.csv')
   check.dir(output.file4)
-  if(file.exists(output.file4)){
+  if(file.exists(output.file4) & redo == F){
     print(paste0('File already exists: ',output.file4))
-  }else{
+  }else if(do.model.anom == T){
     EDAB.GLORYS::make_bottom_temp_model_anom(input.file = this.year.files,
                                              output.file = output.file4,
                                              shp.file =shp.file,
@@ -129,9 +141,9 @@ for(y in 1:length(run.years)){
   
   output.file5 = paste0(output.dir,'data/bottom_temp_model_annual/GLORYS_bottom_temp_model_annual_',run.years[y],'.csv')
   check.dir(output.file5)
-  if(file.exists(output.file5)){
+  if(file.exists(output.file5) & redo == F){
     print(paste0('File already exists: ',output.file5))
-  }else{
+  }else if(do.model.annual == T){
     EDAB.GLORYS::make_bottom_temp_model_annual(input.file = this.year.files,
                                                output.file = output.file5,
                                                shp.file = shp.file,
@@ -146,9 +158,9 @@ for(y in 1:length(run.years)){
   
   output.file5b = paste0(output.dir,'data/bottom_temp_daily_epu/GLORYS_bottom_temp_daily_epu_',run.years[y],'.csv')
   check.dir(output.file5b)
-  if(file.exists(output.file5b)){
+  if(file.exists(output.file5b) & redo == F){
     print(paste0('File already exists: ',output.file5b))
-  }else{
+  }else if(do.daily.epu == T){
     EDAB.GLORYS::make_bottom_temp_daily_epu(input.file = this.year.files,
                                                output.file = output.file5b,
                                                shp.file = shp.file,
@@ -164,9 +176,9 @@ for(y in 1:length(run.years)){
         
   output.file6 = paste0(output.dir,'data/thermal_habitat_gridded/GLORYS_thermal_habitat_gridded_',run.years[y],'.nc')
   check.dir(output.file6)
-  if(file.exists(output.file6) | no.threshold){
+  if(file.exists(output.file6) & redo == F){
     print(paste0('File already exists: ',output.file6))
-  }else{
+  }else if(do.thermal.gridded == T){
     EDAB.GLORYS::make_thermal_habitat_gridded(input.file = this.year.files,
                                               output.file =  output.file6,
                                               supp.dir = supp.dir,
@@ -184,11 +196,10 @@ for(y in 1:length(run.years)){
   output.file7b = paste0(output.dir,'data/thermal_habitat_gridded/GLORYS_thermal_habitat_gridded_',run.years[y],'.csv')
   check.dir(output.file7a)
   
-  if(file.exists(output.file7a) & file.exists(output.file7b) | no.threshold){
+  if(file.exists(output.file7a) & file.exists(output.file7b)  & redo == F){
     print(paste0('File already exists: ',output.file7a, ' and ', output.file7b))
-  }else{
+  }else if(do.thermal.area == T){
 
-    if(any(file.size(this.year.files)==0))
     EDAB.GLORYS::make_thermal_habitat_area(input.file = this.year.files,
                                            output.file.area =  output.file7a,
                                            output.file.gridded = output.file7b  ,
@@ -227,28 +238,29 @@ ggplot(data, aes(x = year, y = Value, color = source))+
   facet_grid(EPU~season)
 ggsave(here::here('GLORYS_bottom_temp_2025.png'),width =12, height = 12)
 
+
 model.anom.files = list.files(paste0(output.dir,'data/bottom_temp_model_anom/'),full.names = T)
 model.anom.data = lapply(model.anom.files, read.csv) |>
   dplyr::bind_rows()
-saveRDS(model.anom.data, file = 'V:/GLORYS_bottom_temp_model_anom_1993_2025.rds')
+saveRDS(model.anom.data, file = paste0(indicator.dir,'GLORYS_bottom_temp_model_anom_1993_2025.rds'))
 
 model.annual.files = list.files(paste0(output.dir,'data/bottom_temp_model_annual/'),full.names = T)
 model.annual.data = lapply(model.annual.files, read.csv) |>
   dplyr::bind_rows()
-saveRDS(model.annual.data, file = 'V:/GLORYS_bottom_temp_model_annual_1993_2025.rds')
+saveRDS(model.annual.data, file = paste0(indicator.dir,'GLORYS_bottom_temp_model_annual_1993_2025.rds'))
 
 model.gridded.files = list.files(paste0(output.dir,'data/bottom_temp_model_gridded/'),full.names = T)
 model.gridded.data = lapply(model.gridded.files,read.csv) |>
   dplyr::bind_rows()
-saveRDS(model.gridded.data, file = 'V:/GLORYS_bottom_temp_model_gridded_1993_2025.rds')
+saveRDS(model.gridded.data, file = paste0(indicator.dir,'GLORYS_bottom_temp_model_gridded_1993_2025.rds'))
 
 thermal.area.files = list.files(paste0(output.dir,'data/thermal_habitat_area/'),full.names = T)
 thermal.area.data = lapply(thermal.area.files, read.csv) |>
   dplyr::bind_rows()
-saveRDS(thermal.area.data, file = 'V:/GLORYS_thermal_habitat_area_1993_2025.rds')
+saveRDS(thermal.area.data, file = paste0(indicator.dir,'GLORYS_thermal_habitat_area_1993_2025.rds'))
 
 #only get csv files
 thermal.gridded.files = list.files(path = paste0(output.dir,'data/thermal_habitat_gridded/'),pattern = '*.csv',full.names = T)
 thermal.gridded.data = lapply(thermal.gridded.files, read.csv) |>
   dplyr::bind_rows()
-saveRDS(thermal.gridded.data, file = 'V:/GLORYS_thermal_habitat_gridded_1993_2025.rds')
+saveRDS(thermal.gridded.data, file = paste0(indicator.dir,'GLORYS_thermal_habitat_gridded_1993_2025.rds'))

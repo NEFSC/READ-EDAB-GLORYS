@@ -36,7 +36,7 @@ make_bottom_temp_model_anom = function(input.file,
                                                         agg.time = 'season',
                                                         statistic = 'mean',
                                                         touches =F,
-                                                        file.time = 'annual',
+                                                        file.time = 'daily',
                                                         area.names = c('MAB','GB','GOM','SS')
   )
   
