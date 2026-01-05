@@ -227,3 +227,28 @@ ggplot(data, aes(x = year, y = Value, color = source))+
   facet_grid(EPU~season)
 ggsave(here::here('GLORYS_bottom_temp_2025.png'),width =12, height = 12)
 
+model.anom.files = list.files(paste0(output.dir,'data/bottom_temp_model_anom/'),full.names = T)
+model.anom.data = lapply(model.anom.files, read.csv) |>
+  dplyr::bind_rows()
+saveRDS(model.anom.data, file = 'V:/GLORYS_bottom_temp_model_anom_1993_2025.rds')
+
+model.annual.files = list.files(paste0(output.dir,'data/bottom_temp_model_annual/'),full.names = T)
+model.annual.data = lapply(model.annual.files, read.csv) |>
+  dplyr::bind_rows()
+saveRDS(model.annual.data, file = 'V:/GLORYS_bottom_temp_model_annual_1993_2025.rds')
+
+model.gridded.files = list.files(paste0(output.dir,'data/bottom_temp_model_gridded/'),full.names = T)
+model.gridded.data = lapply(model.gridded.files,read.csv) |>
+  dplyr::bind_rows()
+saveRDS(model.gridded.data, file = 'V:/GLORYS_bottom_temp_model_gridded_1993_2025.rds')
+
+thermal.area.files = list.files(paste0(output.dir,'data/thermal_habitat_area/'),full.names = T)
+thermal.area.data = lapply(thermal.area.files, read.csv) |>
+  dplyr::bind_rows()
+saveRDS(thermal.area.data, file = 'V:/GLORYS_thermal_habitat_area_1993_2025.rds')
+
+#only get csv files
+thermal.gridded.files = list.files(path = paste0(output.dir,'data/thermal_habitat_gridded/'),pattern = '*.csv',full.names = T)
+thermal.gridded.data = lapply(thermal.gridded.files, read.csv) |>
+  dplyr::bind_rows()
+saveRDS(thermal.gridded.data, file = 'V:/GLORYS_thermal_habitat_gridded_1993_2025.rds')
