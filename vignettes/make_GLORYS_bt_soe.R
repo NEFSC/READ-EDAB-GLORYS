@@ -8,13 +8,14 @@ if(length(args)>0){
   output.dir = args[3]
   print('Using command line arguments')
 }else{
-  # input.dir = 'C:/Users/joseph.caracappa/Documents/Data/GLORYS/GLORYS_dailAy/'
-  input.dir = '/home/jcaracappa/EDAB_Datasets/GLORYS/glorys_bottomT/cmems_mod_glo_phy_my_0.083deg_P1D-m/bottomT_NEUS/'
-  # output.dir = 'C:/Users/joseph.caracappa/Documents/GitHub/READ_EDAB_GLORYS/'
-  output.dir = '/home/jcaracappa/EDAB_Dev/jcaracappa/glorys_my_soe/'
-  # supp.dir = 'C:/Users/joseph.caracappa/Documents/GitHub/READ_EDAB_GLORYS/data-raw/'
-  supp.dir = '/home/jcaracappa/EDAB_Resources/workflow_resources/'
-  indicator.dir = '/home/jcaracappa/EDAB_Indicators/'
+  input.dir = 'W:/GLORYS/glorys_bottomT/cmems_mod_glo_phy_my_0.083deg_P1D-m/bottomT_NEUS/'
+  # input.dir = '/home/jcaracappa/EDAB_Datasets/GLORYS/glorys_bottomT/cmems_mod_glo_phy_my_0.083deg_P1D-m/bottomT_NEUS/'
+  output.dir = 'X:/jcaracappa/glorys_my_soe/'
+  # output.dir = '/home/jcaracappa/EDAB_Dev/jcaracappa/glorys_my_soe/'
+  supp.dir = 'Y:/workflow_resources/'
+  # supp.dir = '/home/jcaracappa/EDAB_Resources/workflow_resources/'
+  indicator.dir = 'V:/'
+  # indicator.dir = '/home/jcaracappa/EDAB_Indicators/'
   
   print('Using default arguments')
 }
@@ -43,7 +44,7 @@ check.dir = function(file){
   if(!dir.exists(dirname(file))){dir.create(dirname(file),recursive =T)}
 }
 #Make seasonal climatology
-output.file1 =  '/home/jcaracappa/EDAB_Dev/jcaracappa/glorys_soe/data/climatology/GLORYS_bottom_temp_seasonal_clim_1990_2020.csv'
+output.file1 =  paste0(output.dir,'data/climatology/GLORYS_bottom_temp_seasonal_clim_1990_2020.csv')
 check.dir(output.file1)
 if(!file.exists(output.file1)){
   EDAB.GLORYS::make_gridded_climatology(input.dir = input.dir,
@@ -61,7 +62,7 @@ if(!file.exists(output.file1)){
 }
 
 #Make Annual Climatology
-output.file2 = '/home/jcaracappa/EDAB_Dev/jcaracappa/glorys_soe/data/climatology/GLORYS_bottom_temp_annual_clim_1990_2020.csv'
+output.file2 = paste0(output.dir,'data/climatology/GLORYS_bottom_temp_annual_clim_1990_2020.csv')
 check.dir(output.file2)
 if(!file.exists(output.file2)){
   EDAB.GLORYS::make_gridded_climatology(input.dir =input.dir,
