@@ -1,8 +1,9 @@
-#' Createst the thermal_habitat_gridded inidcator for the State of the Ecosystem Report
+#' Creates the thermal_habitat_gridded indicator for the State of the Ecosystem Report
 #'
 #' descriptions
 #'
-#' @param input.file Either a character vector of full input file names for a list of spatrasters
+#' @param input.file Character. Either a single path to a NetCDF file with multiple time layers, 
+#'   or a character vector of file paths (e.g. daily files) to be combined.
 #' @param output.file.area character with full file name for thermal_habitat_area output csv
 #' @param output.file.gridded character with full file name for thermal_habitat_gridded output csv
 #' @param shp.file  string. Shape file you wish to crop each input file to
@@ -19,7 +20,7 @@
 #' 
 
 make_thermal_habitat_area = function(input.file, output.file.area = NA, output.file.gridded =NA, shp.file, file.year,t.max.seq, write.area = F, write.gridded = F){
-
+  
   EPU.names = c('MAB','GB','GOM','SS','all')
   depth.df = data.frame(depth.min = c(0,25,100, 0),
                         depth.max = c(25,100,300, 2000),
@@ -29,6 +30,24 @@ make_thermal_habitat_area = function(input.file, output.file.area = NA, output.f
     dplyr::left_join(depth.df)
   
   bathy.shp = terra::rast(paste0(supp.dir,'GLORYS/GLORYS_bathymetry_east_coast_crop.nc'),subds = 'deptho')
+  
+  # --- Refactor Start: Handle Input Files ---
+  # Convert input to a single SpatRaster. 
+  # terra::rast() handles both a single multi-layer file OR a vector of single-layer files.
+  processed_rast = terra::rast(input.file)
+  
+  # Ensure time dimension is set if missing (common when stacking individual daily files)
+  # This logic matches layers to days in the specified file.year
+  if (!all(terra::has.time(processed_rast))) {
+    # Generate daily sequence for the given year
+    dates = seq(as.Date(paste0(file.year, "-01-01")), as.Date(paste0(file.year, "-12-31")), by="day")
+    
+    # If layer count matches the days in the year, assign the time
+    if (terra::nlyr(processed_rast) == length(dates)) {
+      terra::time(processed_rast) = dates
+    }
+  }
+  # --- Refactor End ---
   
   out.area.ls = list()
   out.gridded.ls = list()
@@ -40,10 +59,9 @@ make_thermal_habitat_area = function(input.file, output.file.area = NA, output.f
       area.names = combs$EPU[i]
     }
     
-    this.file = input.file
-    
     if(i ==1){
-      neus.shp = terra::crop(bathy.shp,terra::rast(this.file))
+      # Refactor: use processed_rast instead of loading from file again
+      neus.shp = terra::crop(bathy.shp, processed_rast)
     }
     
     depth.rast = terra::clamp(neus.shp, lower = combs$depth.min[i], upper = combs$depth.max[i],values =F)
@@ -53,7 +71,8 @@ make_thermal_habitat_area = function(input.file, output.file.area = NA, output.f
     area.mask = terra::mask(depth.rast,area.vect)
     
     #Mask of area over t.max
-    area.i = EDABUtilities::mask_nc_2d(data.in = this.file,
+    # Refactor: Pass the SpatRaster object (processed_rast) instead of filename
+    area.i = EDABUtilities::mask_nc_2d(data.in = processed_rast,
                                        write.out =F,
                                        shp.file = area.mask,
                                        var.name = 'BottomT',
@@ -63,7 +82,8 @@ make_thermal_habitat_area = function(input.file, output.file.area = NA, output.f
                                        area.names =NA
     )
     
-    this.rast = terra::subset(terra::rast(this.file),1)
+    # Refactor: Subset from the main raster object
+    this.rast = terra::subset(processed_rast, 1)
     
     nd.i = EDABUtilities::make_2d_deg_day_gridded_nc(data.in = area.i,
                                                      shp.file = area.mask,
@@ -79,14 +99,14 @@ make_thermal_habitat_area = function(input.file, output.file.area = NA, output.f
     area.df = terra::expanse(area.i[[1]]) %>%
       as.data.frame()%>%
       dplyr::mutate(Time = terra::time(area.i[[1]]),
-             EPU = combs$EPU[i],
-             Depth = combs$depth.name[i],
-             Var = paste0('>',combs$t.max[i],'\u00B0C'),
-             Value = area/ shp.area,
-             Source = 'GLORYS',
-             year = combs$year[i],
-             temp.threshold = combs$t.max[i],
-             Units = 'Proportion'
+                    EPU = combs$EPU[i],
+                    Depth = combs$depth.name[i],
+                    Var = paste0('>',combs$t.max[i],'\u00B0C'),
+                    Value = area/ shp.area,
+                    Source = 'GLORYS',
+                    year = combs$year[i],
+                    temp.threshold = combs$t.max[i],
+                    Units = 'Proportion'
       )
     
     out.area.ls[[i]] = area.df
@@ -106,7 +126,7 @@ make_thermal_habitat_area = function(input.file, output.file.area = NA, output.f
     dplyr::summarise(Value = mean(Value))%>%
     dplyr::rename(Time = Year)
   
-    out.gridded.df = dplyr::bind_rows(out.gridded.ls)
+  out.gridded.df = dplyr::bind_rows(out.gridded.ls)
   
   if(write.area == T){
     write.csv(out.area.df, output.file.area,row.names = F)
@@ -119,5 +139,3 @@ make_thermal_habitat_area = function(input.file, output.file.area = NA, output.f
   }
   
 }
-
-  

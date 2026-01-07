@@ -8,21 +8,21 @@ if(length(args)>0){
   output.dir = args[3]
   print('Using command line arguments')
 }else{
-  input.dir = 'W:/GLORYS/glorys_bottomT/cmems_mod_glo_phy_my_0.083deg_P1D-m/bottomT_NEUS/'
-  # input.dir = '/home/jcaracappa/EDAB_Datasets/GLORYS/glorys_bottomT/cmems_mod_glo_phy_my_0.083deg_P1D-m/bottomT_NEUS/'
-  output.dir = 'X:/jcaracappa/glorys_my_soe/'
-  # output.dir = '/home/jcaracappa/EDAB_Dev/jcaracappa/glorys_my_soe/'
-  supp.dir = 'Y:/workflow_resources/'
-  # supp.dir = '/home/jcaracappa/EDAB_Resources/workflow_resources/'
-  indicator.dir = 'V:/'
-  # indicator.dir = '/home/jcaracappa/EDAB_Indicators/'
+  #input.dir = 'W:/GLORYS/glorys_bottomT/cmems_mod_glo_phy_my_0.083deg_P1D-m/bottomT_NEUS/'
+  input.dir = '/home/jcaracappa/EDAB_Datasets/GLORYS/glorys_bottomT/cmems_mod_glo_phy_my_0.083deg_P1D-m/bottomT_NEUS/'
+  #output.dir = 'X:/jcaracappa/glorys_my_soe/'
+  output.dir = '/home/jcaracappa/EDAB_Dev/jcaracappa/glorys_my_soe/'
+  #supp.dir = 'Y:/workflow_resources/'
+  supp.dir = '/home/jcaracappa/EDAB_Resources/workflow_resources/'
+  #indicator.dir = 'V:/'
+  indicator.dir = '/home/jcaracappa/EDAB_Indicators/'
   
   print('Using default arguments')
 }
 shp.file = paste0(supp.dir,'shapefiles/EPU_NOESTUARIES.shp')
 
 #Get year range
-year.start = 2007
+year.start = 1993
 year.end = format(Sys.time(), '%Y')
 run.years = year.start:year.end
 y=1
@@ -31,10 +31,10 @@ input.files = list.files(input.dir,input.prefix)
 input.files.year = as.numeric(gsub(".*(\\d{4}).*", '\\1', input.files))
 
 redo = T
-do.model.anom = T
-do.model.annual = F
-do.model.gridded = F
-do.daily.epu = F
+do.model.anom = F
+do.model.annual = T
+do.model.gridded = T
+do.daily.epu = T
 do.thermal.area = F
 do.thermal.gridded = F
 
@@ -242,7 +242,8 @@ ggsave(here::here('GLORYS_bottom_temp_2025.png'),width =12, height = 12)
 
 model.anom.files = list.files(paste0(output.dir,'data/bottom_temp_model_anom/'),full.names = T)
 model.anom.data = lapply(model.anom.files, read.csv) |>
-  dplyr::bind_rows()
+  dplyr::bind_rows() |>
+  dplyr::bind_rows(read.csv('/home/jcaracappa/EDAB_Datasets/ROMS_NWA/roms_seasonal_anomaly.csv'))
 saveRDS(model.anom.data, file = paste0(indicator.dir,'GLORYS_bottom_temp_model_anom_1993_2025.rds'))
 
 model.annual.files = list.files(paste0(output.dir,'data/bottom_temp_model_annual/'),full.names = T)
