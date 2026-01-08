@@ -243,17 +243,21 @@ ggsave(here::here('GLORYS_bottom_temp_2025.png'),width =12, height = 12)
 model.anom.files = list.files(paste0(output.dir,'data/bottom_temp_model_anom/'),full.names = T)
 model.anom.data = lapply(model.anom.files, read.csv) |>
   dplyr::bind_rows() |>
-  dplyr::bind_rows(read.csv('/home/jcaracappa/EDAB_Datasets/ROMS_NWA/roms_seasonal_anomaly.csv'))
+  # dplyr::bind_rows(read.csv('/home/jcaracappa/EDAB_Datasets/ROMS_NWA/roms_seasonal_anomaly.csv'))
+  dplyr::bind_rows(read.csv('W:/ROMS_NWA/roms_seasonal_anomaly.csv'))
 saveRDS(model.anom.data, file = paste0(indicator.dir,'GLORYS_bottom_temp_model_anom_1993_2025.rds'))
 
 model.annual.files = list.files(paste0(output.dir,'data/bottom_temp_model_annual/'),full.names = T)
-model.annual.data = lapply(model.annual.files, read.csv) |>
-  dplyr::bind_rows()
+model.annual.data = dplyr::bind_rows(lapply(model.annual.files, read.csv)) |>
+  # dplyr::bind_rows(read.csv('/home/jcaracappa/EDAB_Datasets/ROMS_NWA/roms_bottomT_annual.csv'))
+  dplyr::bind_rows(read.csv('W:/ROMS_NWA/roms_bottomT_annual.csv'))
 saveRDS(model.annual.data, file = paste0(indicator.dir,'GLORYS_bottom_temp_model_annual_1993_2025.rds'))
 
 model.gridded.files = list.files(paste0(output.dir,'data/bottom_temp_model_gridded/'),full.names = T)
 model.gridded.data = lapply(model.gridded.files,read.csv) |>
-  dplyr::bind_rows()
+  dplyr::bind_rows() |> 
+  # dplyr::bind_rows(read.csv('/home/jcaracappa/EDAB_Datasets/ROMS_NWA/roms_seasonal_gridded.csv'))
+  dplyr::bind_rows(read.csv('W:/ROMS_NWA/roms_seasonal_gridded.csv'))
 saveRDS(model.gridded.data, file = paste0(indicator.dir,'GLORYS_bottom_temp_model_gridded_1993_2025.rds'))
 
 thermal.area.files = list.files(paste0(output.dir,'data/thermal_habitat_area/'),full.names = T)
