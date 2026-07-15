@@ -65,10 +65,11 @@ make_monthly_gridded = function(input.dir, input.prefix, output.dir, output.pref
     }else{
       
       #Make the gridded summary
+      this.output = paste0(output.dir,output.prefix,this.year,'_',this.month,'.nc')
       data.summary =EDABUtilities::make_2d_summary_gridded(data.in = paste0(input.dir,this.month.files),
                                              file.time = 'daily',
                                              write.out =T,
-                                             output.files = paste0(output.dir,output.prefix,this.year,'_',this.month,'.nc'),
+                                             output.files = this.output,
                                              shp.file = NA,
                                              var.name = var.name,
                                              agg.time = 'months',
@@ -76,6 +77,7 @@ make_monthly_gridded = function(input.dir, input.prefix, output.dir, output.pref
                                              area.names = NA)                                             
       
      
+      message('Done: make_monthly_gridded for ',this.year,'-',this.month, 'in ',this.output)
     }
   }
 }
