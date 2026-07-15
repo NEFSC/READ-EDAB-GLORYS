@@ -1,7 +1,7 @@
 #CommandLine Local
-# Rscript vignettes/GLORYS_automation_test.R "W:/GLORYS/v12/SOURCE/NES_9KM_DAILY/BOTTOMT/" "X:/jcaracappa/glorys_my_soe/monthly/" "Y:/workflow_resources/"
+# Rscript vignettes/GLORYS_automation_test.R "W:/GLORYS/v12/SOURCE/NES_9KM_DAILY/BOTTOMT/" "Y:/workflow_resources/" "X:/jcaracappa/glorys_my_soe/monthly/" 
 #Command Line Cloud
-#Rscript //nefscdata/EDAB_Workflows/GLORYS_automation_test.R "//nefscdata/EDAB_Datasets/GLORYS/v12/SOURCE/NES_9KM_DAILY/BOTTOMT/" "//nefscdata/EDAB_Dev/jcaracappa/glorys_my_soe/monthly/" "//nefscdatac/EDAB_Resources/workflow_resources/"
+#Rscript //nefscdata/EDAB_Workflows/GLORYS_automation_test.R "//nefscdata/EDAB_Datasets/GLORYS/v12/SOURCE/NES_9KM_DAILY/BOTTOMT/" "//nefscdatac/EDAB_Resources/workflow_resources/" "//nefscdata/EDAB_Dev/jcaracappa/glorys_my_soe/monthly/" 
 
 #Gets arguments from command line
 args = commandArgs(trailingOnly = TRUE)
