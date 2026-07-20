@@ -11,7 +11,7 @@
 #' 
 #' @return a dataframe (Time, Latitude, Longitude, var, value) or csv file of the gridded data
 #' 
-#' @importFrom magrittr "%>%"
+#' @importFrom magrittr "|>"
 #' 
 #' @export
 #' 
@@ -47,17 +47,17 @@ make_bottom_temp_model_anom = function(input.file,
   
   glorys.anom.clim = read.csv(climatology.file)
 
-  data.all.anom = glorys.season.epu %>%
-    dplyr::left_join(glorys.anom.clim)%>%
-    dplyr::rename(Source = 'Var')%>%
-    dplyr::mutate(value.anom = value-value.clim)%>%
-    dplyr::left_join(season.match,by = c('time'= 'season.id')) %>%
-    dplyr::mutate(dum = '_Bottom Temp Anomaly')%>%
-    tidyr::unite(Var,c('season.name','dum'),sep='')%>%
+  data.all.anom = glorys.season.epu |>
+    dplyr::left_join(glorys.anom.clim)|>
+    dplyr::rename(Source = 'Var')|>
+    dplyr::mutate(value.anom = value-value.clim)|>
+    dplyr::left_join(season.match,by = c('time'= 'season.id')) |>
+    dplyr::mutate(dum = '_Bottom Temp Anomaly')|>
+    tidyr::unite(Var,c('season.name','dum'),sep='')|>
     dplyr::rename(Time = 'year',
            EPU = 'area',
-           Value = 'value.anom')%>%
-    dplyr::mutate(Units = 'degree C')%>%
+           Value = 'value.anom')|>
+    dplyr::mutate(Units = 'degree C')|>
     dplyr::select(Time, Value, EPU, Source, Var, Units)
   
   if(write.out){

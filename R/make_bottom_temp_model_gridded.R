@@ -10,7 +10,7 @@
 #' 
 #' @return a dataframe (Time, Latitude, Longitude, var, value) or csv file of the gridded data
 #' 
-#' @importFrom magrittr "%>%"
+#' @importFrom magrittr "|>"
 #' 
 #' @export
 #' 
@@ -39,9 +39,9 @@ make_bottom_temp_model_gridded = function(input.file,
   
   glorys.season.mean =terra::as.data.frame(terra::rast(glorys.season),xy =T)
   colnames(glorys.season.mean) = c('Longitude','Latitude','winter','spring','summer','fall')[1:ncol(glorys.season.mean)]
-  glorys.season.mean = glorys.season.mean %>%
-      tidyr::gather(Var,Value,-Longitude,-Latitude)%>%
-      dplyr::mutate(Time = file.year )%>%
+  glorys.season.mean = glorys.season.mean |>
+      tidyr::gather(Var,Value,-Longitude,-Latitude)|>
+      dplyr::mutate(Time = file.year )|>
       dplyr::select(Time,Latitude,Longitude,Var,Value)
   
   

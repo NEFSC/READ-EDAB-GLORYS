@@ -10,7 +10,7 @@
 #' 
 #' @return a dataframe (Time, Latitude, Longitude, var, value) or csv file of the gridded data
 #' 
-#' @importFrom magrittr "%>%"
+#' @importFrom magrittr "|>"
 #' 
 #' @export
 #' 
@@ -36,17 +36,17 @@ make_bottom_temp_model_annual = function(input.file,
                                                      area.names = c('MAB','GB','GOM','SS')
   )
   
-  data.all.mean = glorys.epu.day[[1]] %>%
-    dplyr::mutate(year = format(as.Date(time),format = '%Y'))%>%
-    dplyr::group_by(year,area)%>%
-    dplyr::summarise(Value = mean(value,na.rm=T))%>%
-    dplyr::mutate(source = 'GLORYS') %>%
+  data.all.mean = glorys.epu.day[[1]] |>
+    dplyr::mutate(year = format(as.Date(time),format = '%Y'))|>
+    dplyr::group_by(year,area)|>
+    dplyr::summarise(Value = mean(value,na.rm=T))|>
+    dplyr::mutate(source = 'GLORYS') |>
     dplyr::rename(Time = 'year',
            EPU = 'area',
-           Source = 'source')%>%
+           Source = 'source')|>
     dplyr::mutate(Var = 'Annual_Bottom Temp',
            Units = 'degree C',
-           Time = as.numeric(Time))%>%
+           Time = as.numeric(Time))|>
     dplyr::select(Time,Value,EPU,Source,Var,Units)
   
   if(write.out){

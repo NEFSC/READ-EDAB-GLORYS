@@ -10,7 +10,7 @@
 #' 
 #' @return a dataframe (Time, Latitude, Longitude, var, value) or csv file of the gridded data
 #' 
-#' @importFrom magrittr "%>%"
+#' @importFrom magrittr "|>"
 #' 
 #' @export
 #' 
@@ -34,12 +34,12 @@ make_bottom_temp_daily_epu = function(input.file, output.file, shp.file, file.ye
     )
     out.epu.ls = list()
     for(j in 1:length(this.data.rast)){
-      out.epu.ls[[j]] = terra::as.data.frame(terra::rast(this.data.rast[j][[1]]),xy =T,time = T,wide =F) %>% 
-        dplyr::select(-layer) %>% 
-        dplyr::group_by(time) %>% 
+      out.epu.ls[[j]] = terra::as.data.frame(terra::rast(this.data.rast[j][[1]]),xy =T,time = T,wide =F) |> 
+        dplyr::select(-layer) |> 
+        dplyr::group_by(time) |> 
         dplyr::summarise(BottomT.mean = mean(values,na.rm=T),
-                         BottomT.sd = sd(values,na.rm=T)) %>%
-        dplyr::rename(date = 'time') %>% 
+                         BottomT.sd = sd(values,na.rm=T)) |>
+        dplyr::rename(date = 'time') |> 
         dplyr::mutate(EPU = epu.names[i],
                       source = 'GLORYS')
     }

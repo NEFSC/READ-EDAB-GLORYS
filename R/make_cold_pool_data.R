@@ -9,8 +9,6 @@
 #' 
 #' @return RDS file with the processed data for GLORYS and ROMS
 #' 
-#' @importFrom magrittr "%>%"
-#' 
 #' @export
 #' 
 
@@ -33,18 +31,18 @@ make_cold_pool_data = function(input.files, output.dir,output.prefix,cp.shp.file
     
     file.years[i] = format(terra::time(data.rast),'%Y')[1]
     #Crop input data to cp.shp
-    data.crop = data.rast %>%
-      terra::crop(cp.shp) %>%
+    data.crop = data.rast |>
+      terra::crop(cp.shp) |>
       terra::mask(cp.shp) 
     
     names(data.crop) = terra::time(data.crop)
       
-    data.df.ls[[i]] = terra::as.data.frame(data.crop,cell = T)%>%
-      tidyr::gather(date,value,-cell)%>%
+    data.df.ls[[i]] = terra::as.data.frame(data.crop,cell = T)|>
+      tidyr::gather(date,value,-cell)|>
       dplyr::mutate(date = as.Date(date),
                     month = format(date, "%m"),
-                    year = format(date,'%Y'))%>%
-      dplyr::group_by(year,month,cell)%>%
+                    year = format(date,'%Y'))|>
+      dplyr::group_by(year,month,cell)|>
       dplyr::summarise(value = mean(value,na.rm=T))
     
     terra::writeCDF(data.crop,varname = 'BottomT',filename =paste0(output.dir,output.prefix,file.years[i],'.nc'),overwrite =T)

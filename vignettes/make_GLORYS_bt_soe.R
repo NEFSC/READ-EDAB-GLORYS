@@ -226,11 +226,11 @@ all(1959:2025 %in% sort(unique(format(as.Date(glorys.heatwave.data$date),format 
 glorys.heatwaves.out = write.csv(glorys.heatwave.data,paste0('/home/jcaracappa/EDAB_Dev/jcaracappa/ROMS_GLORYS_bottom_temp_model_daily_epu_',1959,'_',format(Sys.time(), '%Y'),'.csv'), row.names =F)
 
 season.index = data.frame(month = 1:12, season = rep(c('Winter','Spring','Summer','Fall'),each = 3))
-data = glorys.heatwave.data %>% 
+data = glorys.heatwave.data |> 
   dplyr::mutate(month = as.numeric(format(as.Date(date),format = '%m')),
-                year = as.numeric(format(as.Date(date),format = '%Y'))) %>% 
-  dplyr::left_join(season.index) %>% 
-  dplyr::group_by(source,year,season,EPU) %>% 
+                year = as.numeric(format(as.Date(date),format = '%Y'))) |> 
+  dplyr::left_join(season.index) |> 
+  dplyr::group_by(source,year,season,EPU) |> 
   dplyr::summarise(Value = mean(BottomT.mean,na.rm=T))
   
 library(ggplot2)

@@ -61,13 +61,13 @@ roms.grid = terra::subset(roms.crop,1)
 terra::values(roms.grid) = NA
 terra::writeCDF(roms.grid,varname = 'BottomT',filename=paste0(output.dir,'roms_cold_pool_grid.nc'),overwrite =T)
 
-roms.df = terra::as.data.frame(roms.crop,cell = T)%>%
-  tidyr::gather(date,value,-cell)%>%
+roms.df = terra::as.data.frame(roms.crop,cell = T)|>
+  tidyr::gather(date,value,-cell)|>
   dplyr::mutate(date = as.Date(date),
                 month = format(date, "%m"),
-                year = format(date,'%Y'))%>%
-  dplyr::group_by(year,month,cell)%>%
-  dplyr::summarise(value = mean(value,na.rm=T))%>%
+                year = format(date,'%Y'))|>
+  dplyr::group_by(year,month,cell)|>
+  dplyr::summarise(value = mean(value,na.rm=T))|>
   dplyr::mutate(source = 'ROMS')
 
 saveRDS(roms.df, paste0(output.dir,'roms_debiased_cold_pool_monthly_',roms.years[1],'_',roms.years[length(roms.years)],'.rds'))

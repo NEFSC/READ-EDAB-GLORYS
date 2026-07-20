@@ -9,7 +9,7 @@
 #' 
 #' @return RDS file with the annual and maximum cold pool extent
 #' 
-#' @importFrom magrittr "%>%"
+#' @importFrom magrittr "|>"
 #' 
 #' @export
 #' 
@@ -21,18 +21,18 @@ make_cold_pool_extent = function(input.data,output.dir,shp.file,grid.file){
   
   cp.months = 6:9
   
-  bt_temp_time_series_month <- input.data%>%
+  bt_temp_time_series_month <- input.data|>
     dplyr::mutate(month = as.numeric(month))
   
   year.min = min(bt_temp_time_series_month$year)
   year.max = max(bt_temp_time_series_month$year)
   
   #Find maximum cold pool extent over all years. Whenever a cell in footprint is <10C from June-September
-  cp_max_extent<- bt_temp_time_series_month %>%
-    dplyr::filter(year%in%(year.min:year.max) & month%in%cp.months) %>%
-    dplyr::group_by(cell)  %>%
-    dplyr::summarise(avg_bottom_t=mean(value)) %>%
-    as.data.frame() %>%
+  cp_max_extent<- bt_temp_time_series_month |>
+    dplyr::filter(year%in%(year.min:year.max) & month%in%cp.months) |>
+    dplyr::group_by(cell)  |>
+    dplyr::summarise(avg_bottom_t=mean(value)) |>
+    as.data.frame() |>
     dplyr::filter(avg_bottom_t<10) 
   
   cp.grid = terra::rast(grid.file)
@@ -44,11 +44,11 @@ make_cold_pool_extent = function(input.data,output.dir,shp.file,grid.file){
   #   geom_tile()
   
   #Calculate annual cold pool extent
-  cp_annual_extent = bt_temp_time_series_month %>%
-    dplyr::filter(year%in%(year.min:year.max) & month%in%cp.months) %>%
-    dplyr::group_by(year,cell)  %>%
-    dplyr::summarise(avg_bottom_t=mean(value)) %>%
-    as.data.frame() %>%
+  cp_annual_extent = bt_temp_time_series_month |>
+    dplyr::filter(year%in%(year.min:year.max) & month%in%cp.months) |>
+    dplyr::group_by(year,cell)  |>
+    dplyr::summarise(avg_bottom_t=mean(value)) |>
+    as.data.frame() |>
     dplyr::filter(avg_bottom_t<10) 
   
   cp_annual_extent =cbind(cp_annual_extent,terra::xyFromCell(cp.grid,cell = cp_annual_extent$cell))

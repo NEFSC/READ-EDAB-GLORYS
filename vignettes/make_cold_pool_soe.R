@@ -9,9 +9,9 @@ EDAB.GLORYS::make_cold_pool_data(
                     cp.shp.file = here::here('data-raw','geometry','cold_pool_area_GLORYS.shp')
 )
 
-glorys.data = readRDS(here::here('data','cold_pool','GLORYS','glorys_cold_pool_monthly_1993_2024.rds')) %>%
+glorys.data = readRDS(here::here('data','cold_pool','GLORYS','glorys_cold_pool_monthly_1993_2024.rds')) |>
   dplyr::mutate(source = 'GLORYS')
-roms.data = readRDS(here::here('data','cold_pool','ROMS','roms_debiased_cold_pool_monthly_1959_1992.rds'))%>%
+roms.data = readRDS(here::here('data','cold_pool','ROMS','roms_debiased_cold_pool_monthly_1959_1992.rds'))|>
   dplyr::mutate(source = 'ROMS')
 input.data = dplyr::bind_rows(glorys.data,roms.data)
 rm(glorys.data,roms.data)

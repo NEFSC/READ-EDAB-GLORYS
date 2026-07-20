@@ -14,7 +14,7 @@
 #' 
 #' @return a dataframe (Time, Latitude, Longitude, var, value) or csv file of the gridded data
 #' 
-#' @importFrom magrittr "%>%"
+#' @importFrom magrittr "|>"
 #' 
 #' @export
 #' 
@@ -63,14 +63,14 @@ make_gridded_climatology = function(input.dir,
   #   print(unique.years[i])
   # }
 
-  glorys.season.epu.all = dplyr::bind_rows(glorys.season.epu) %>% 
-    dplyr::rename(year = 'ls.id') %>% 
+  glorys.season.epu.all = dplyr::bind_rows(glorys.season.epu) |> 
+    dplyr::rename(year = 'ls.id') |> 
     dplyr::mutate(Var = 'GLORYS')
   # for(i in 1:length(glorys.years)){glorys.season.epu[[i]] = dplyr::mutate(glorys.season.epu[[i]], year = glorys.years[i], Var = 'GLORYS')}
   
-  data.all.anom.clim =glorys.season.epu.all %>%
-    dplyr::filter(year %in% seq(ref.year.start,ref.year.end)) %>%
-    dplyr::group_by(time,area)%>%
+  data.all.anom.clim =glorys.season.epu.all |>
+    dplyr::filter(year %in% seq(ref.year.start,ref.year.end)) |>
+    dplyr::group_by(time,area)|>
     dplyr::summarise(value.clim = mean(value,na.rm=T))
   
   if(write.out){

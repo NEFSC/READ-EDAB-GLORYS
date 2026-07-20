@@ -8,7 +8,7 @@
 #' 
 #' @return csv with cold pool indices
 #' 
-#' @importFrom magrittr "%>%"
+#' @importFrom magrittr "|>"
 #' 
 #' @export
 #' 
@@ -44,7 +44,7 @@ make_cold_pool_extent_shp = function(input.files, output.dir){
       this.year.mean = terra::mean(this.year,na.rm=T)
       this.year.cp = terra::clamp(this.year.mean, lower = -Inf, upper = 10, values = F)
       # terra::plot(this.year.cp)
-      this.year.cp.shp = terra::as.polygons(this.year.cp, dissolve = T) %>% terra::aggregate()
+      this.year.cp.shp = terra::as.polygons(this.year.cp, dissolve = T) |> terra::aggregate()
       # terra::plot(this.year.cp.shp)
       
       # this.year.month = terra::tapp(this.year,fun = 'mean',index = 'months')
@@ -64,8 +64,8 @@ make_cold_pool_extent_shp = function(input.files, output.dir){
     cp.area.ls[[i]] = cp.area 
   }
   
-  cp.area.df = dplyr::bind_rows(cp.area.ls) %>%
-    dplyr::mutate(source = ifelse(grepl('GLORYS',input.files[1]),'GLORYS','ROMS')) %>%
+  cp.area.df = dplyr::bind_rows(cp.area.ls) |>
+    dplyr::mutate(source = ifelse(grepl('GLORYS',input.files[1]),'GLORYS','ROMS')) |>
     dplyr::select(year,source,area)
   
   saveRDS(cp.area.df,paste0(output.dir,'cold_pool_extent_.rds'))

@@ -48,11 +48,11 @@ if(file.exists(output.roms)){
       )
       out.epu.ls = list()
       for(j in 1:length(this.data.rast)){
-        out.epu.ls[[j]] = terra::as.data.frame(terra::rast(this.data.rast[j][[1]]),xy =T,time = T,wide =F) %>% 
-          dplyr::select(-layer) %>% 
-          dplyr::group_by(time) %>% 
+        out.epu.ls[[j]] = terra::as.data.frame(terra::rast(this.data.rast[j][[1]]),xy =T,time = T,wide =F) |> 
+          dplyr::select(-layer) |> 
+          dplyr::group_by(time) |> 
           dplyr::summarise(BottomT.mean = mean(values,na.rm=T),
-                           BottomT.sd = sd(values,na.rm=T)) %>% 
+                           BottomT.sd = sd(values,na.rm=T)) |> 
           dplyr::mutate(EPU = epu.names[i])
       }
       out.ls[[i]] = dplyr::bind_rows(out.epu.ls)
@@ -63,8 +63,8 @@ if(file.exists(output.roms)){
     
   }
   
-  data.all = bind_rows(data.all.ls) %>% 
-    dplyr::mutate(Source = 'ROMS') %>% 
+  data.all = bind_rows(data.all.ls) |> 
+    dplyr::mutate(Source = 'ROMS') |> 
     dplyr::rename(date = 'time')
   sort(unique(format(as.Date(data.all$date),format = '%Y')))
   write.csv(data.all, '/home/jcaracappa/EDAB_Dev/jcaracappa/ROMS_NWA/ROMS_daily_epu_1959_1992.csv', row.names =F)

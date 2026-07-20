@@ -14,7 +14,7 @@
 #' 
 #' @return a dataframe (Time, Latitude, Longitude, var, value) or csv file of the gridded data
 #' 
-#' @importFrom magrittr "%>%"
+#' @importFrom magrittr "|>"
 #' 
 #' @export
 #' 
@@ -26,7 +26,7 @@ make_thermal_habitat_area = function(input.file, output.file.area = NA, output.f
                         depth.max = c(25,100,300, 2000),
                         depth.name = c('0-25m','25-100m','100-300m', 'AllDepths'))
   
-  combs = expand.grid(year = file.year,t.max = t.max.seq,depth.name = depth.df$depth.name,EPU = EPU.names,stringsAsFactors = F)%>%
+  combs = expand.grid(year = file.year,t.max = t.max.seq,depth.name = depth.df$depth.name,EPU = EPU.names,stringsAsFactors = F)|>
     dplyr::left_join(depth.df)
   
   bathy.shp = terra::rast(paste0(supp.dir,'GLORYS/GLORYS_bathymetry_east_coast_crop.nc'),subds = 'deptho')
@@ -96,8 +96,8 @@ make_thermal_habitat_area = function(input.file, output.file.area = NA, output.f
     
     shp.area = terra::expanse(area.mask)$area
     
-    area.df = terra::expanse(area.i[[1]]) %>%
-      as.data.frame()%>%
+    area.df = terra::expanse(area.i[[1]]) |>
+      as.data.frame()|>
       dplyr::mutate(Time = terra::time(area.i[[1]]),
                     EPU = combs$EPU[i],
                     Depth = combs$depth.name[i],
@@ -111,19 +111,19 @@ make_thermal_habitat_area = function(input.file, output.file.area = NA, output.f
     
     out.area.ls[[i]] = area.df
     
-    out.gridded.ls[[i]] = as.data.frame(nd.i[[1]],cells =T, xy = T) %>%
-      dplyr::mutate(Time = combs$year[i], EPU = combs$EPU[i], Depth = combs$depth.name[i], Var = combs$t.max[i], Source = 'GLORYS',Units = 'Number of Days')%>%
-      dplyr::rename(Latitude = 'y', Longitude = 'x', Value = 'sum')%>%
+    out.gridded.ls[[i]] = as.data.frame(nd.i[[1]],cells =T, xy = T) |>
+      dplyr::mutate(Time = combs$year[i], EPU = combs$EPU[i], Depth = combs$depth.name[i], Var = combs$t.max[i], Source = 'GLORYS',Units = 'Number of Days')|>
+      dplyr::rename(Latitude = 'y', Longitude = 'x', Value = 'sum')|>
       dplyr::select(Time,EPU, Depth, Var,Value,Latitude,Longitude,Source,Units)
     
     print(signif(i/nrow(combs)*100,2))
   }
   
-  out.area.df = dplyr::bind_rows(out.area.ls)%>%
-    dplyr::select(Time, EPU, Depth, Var, Value, Source, year, temp.threshold, Units)%>%
-    dplyr::mutate(Year = format(as.Date(Time),format = '%Y'))%>%
-    dplyr::group_by(Year,EPU, Depth, Var, temp.threshold, Units,Source)%>%
-    dplyr::summarise(Value = mean(Value))%>%
+  out.area.df = dplyr::bind_rows(out.area.ls)|>
+    dplyr::select(Time, EPU, Depth, Var, Value, Source, year, temp.threshold, Units)|>
+    dplyr::mutate(Year = format(as.Date(Time),format = '%Y'))|>
+    dplyr::group_by(Year,EPU, Depth, Var, temp.threshold, Units,Source)|>
+    dplyr::summarise(Value = mean(Value))|>
     dplyr::rename(Time = Year)
   
   out.gridded.df = dplyr::bind_rows(out.gridded.ls)

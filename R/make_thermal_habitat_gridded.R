@@ -12,7 +12,7 @@
 #' 
 #' @return a dataframe (Time, Latitude, Longitude, var, value) or csv file of the gridded data
 #' 
-#' @importFrom magrittr "%>%"
+#' @importFrom magrittr "|>"
 #' 
 #' @export
 #' 
@@ -25,7 +25,7 @@ make_thermal_habitat_gridded = function(input.file, output.file,supp.dir, shp.fi
                         depth.max = c(25,100,300,Inf),
                         depth.name = c('0-25m','25-100m','100-300m','300+'))
   
-    combs = expand.grid(depth.name = depth.df$depth.name,EPU = EPU.names,stringsAsFactors = F)%>%
+    combs = expand.grid(depth.name = depth.df$depth.name,EPU = EPU.names,stringsAsFactors = F)|>
     dplyr::left_join(depth.df) 
  
   bathy.shp = terra::rast(paste0(supp.dir,'GLORYS/GLORYS_bathymetry_east_coast_crop.nc'),subds = 'deptho')
@@ -105,9 +105,9 @@ make_thermal_habitat_gridded = function(input.file, output.file,supp.dir, shp.fi
   terra::writeCDF(out.var,filename = output.file,overwrite =T,missval = 0)
   
   #Format netcdf
-  var.atts = read.csv(paste0(supp.dir,'GLORYS/thermal_habitat_gridded_variable_attributes.csv')) %>%
+  var.atts = read.csv(paste0(supp.dir,'GLORYS/thermal_habitat_gridded_variable_attributes.csv')) |>
     filter(!is.na(Value) & Attribute.Name != '_FillValue')
-  global.atts = read.csv(paste0(supp.dir,'GLORYS/thermal_habitat_gridded_global_attributes.csv'))%>%
+  global.atts = read.csv(paste0(supp.dir,'GLORYS/thermal_habitat_gridded_global_attributes.csv'))|>
     filter(!is.na(Value))
   
   file.nc = ncdf4::nc_open(output.file,write =T)
