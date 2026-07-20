@@ -71,8 +71,8 @@ make_cold_pool_extent_shp = function(input.files, output.dir){
   saveRDS(cp.area.df,paste0(output.dir,'cold_pool_extent_.rds'))
 }
 
-make_cold_pool_extent_shp(input.files = c(here::here('data','cold_pool','ROMS','roms_debiased_cold_pool_1959_1992.nc'),
-                                          list.files(here::here('data','cold_pool','GLORYS'),'*.nc',full.names = TRUE)),
-                          output.dir = here::here('data','cold_pool','extent','/'))
+# make_cold_pool_extent_shp(input.files = c(here::here('data','cold_pool','ROMS','roms_debiased_cold_pool_1959_1992.nc'),
+#                                           list.files(here::here('data','cold_pool','GLORYS'),'*.nc',full.names = TRUE)),
+#                           output.dir = here::here('data','cold_pool','extent','/'))
 
                 

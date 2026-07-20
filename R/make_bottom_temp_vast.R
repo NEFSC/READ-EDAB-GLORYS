@@ -16,20 +16,20 @@
 #' @export
 #' 
 
-input.index = data.frame(
-  series = c('ROMS_debiased','cmems_mod_glo_phy_my_0.083deg_P1D-m'),
-  dir.name = c('W:/ROMS_NWA/',
-               'W:/GLORYS/glorys_bottomT/cmems_mod_glo_phy_my_0.083deg_P1D-m/bottomT/'),
-  start.year = c(1959,1993),
-  end.year = c(1992, 2025)
-)
-output.dir = 'W:/GLORYS/glorys_bottomT/annual_bottomT_vast/V2/'
-output.prefix = 'ROMS_GLORYS_bt_VAST_'
-shp.file = 'Y:/workflow_resources/shapefiles/EPU_NOESTUARIES.shp'
-i = yr = f = 1
-origin = '1950-01-01'
-time.unit = 'days'
-redo = T
+# input.index = data.frame(
+#   series = c('ROMS_debiased','cmems_mod_glo_phy_my_0.083deg_P1D-m'),
+#   dir.name = c('W:/ROMS_NWA/',
+#                'W:/GLORYS/glorys_bottomT/cmems_mod_glo_phy_my_0.083deg_P1D-m/bottomT/'),
+#   start.year = c(1959,1993),
+#   end.year = c(1992, 2025)
+# )
+# output.dir = 'W:/GLORYS/glorys_bottomT/annual_bottomT_vast/V2/'
+# output.prefix = 'ROMS_GLORYS_bt_VAST_'
+# shp.file = 'Y:/workflow_resources/shapefiles/EPU_NOESTUARIES.shp'
+# i = yr = f = 1
+# origin = '1950-01-01'
+# time.unit = 'days'
+# redo = T
 
 make_bottom_temp_temp_vast = function(input.index, output.dir,output.prefix,shp.file, redo =F){
 
