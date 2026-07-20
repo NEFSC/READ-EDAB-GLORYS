@@ -39,22 +39,36 @@ make_gridded_climatology = function(input.dir,
   
   #Retreive years from file names
   glorys.years = as.numeric(gsub(".*(\\d{4}).*", '\\1', data.files))
+  data.files.sub = data.files[which(glorys.years>=ref.year.start & glorys.years<=ref.year.end)]
   
   #Seasonal means by epu for all reference years
-  glorys.season.epu = EDABUtilities::make_2d_summary_ts(data.in = data.files,
-                                                        write.out =F,
-                                                        file.time = 'annual',
-                                                        shp.file =shp.file,
-                                                        var.name = var.name,
-                                                        agg.time = agg.time,
-                                                        statistic = 'mean',
-                                                        touches =F,
-                                                        area.names = c('MAB','GB','GOM','SS')
-  )
+  # unique.years = ref.year.start:ref.year.end
+  # for(i in 1:length(unique.years)){
+  #   this.year.files =  data.files[which(glorys.years == unique.years[i])]
+  #   if(length(this.year.files)==0){
+  #     next()
+  #   }
+  #   tic()
+  glorys.season.epu = EDABUtilities::make_2d_summary_ts(data.in = data.files.sub,
+                                                          write.out =F,
+                                                          file.time = 'daily',
+                                                          shp.file =shp.file,
+                                                          var.name = var.name,
+                                                          agg.time = agg.time,
+                                                          statistic = 'mean',
+                                                          touches =F,
+                                                          area.names = c('MAB','GB','GOM','SS')
+    )
+  #   toc()
+  #   print(unique.years[i])
+  # }
+
+  glorys.season.epu.all = dplyr::bind_rows(glorys.season.epu) %>% 
+    dplyr::rename(year = 'ls.id') %>% 
+    dplyr::mutate(Var = 'GLORYS')
+  # for(i in 1:length(glorys.years)){glorys.season.epu[[i]] = dplyr::mutate(glorys.season.epu[[i]], year = glorys.years[i], Var = 'GLORYS')}
   
-  for(i in 1:length(glorys.years)){glorys.season.epu[[i]] = dplyr::mutate(glorys.season.epu[[i]], year = glorys.years[i], Var = 'GLORYS')}
-  
-  data.all.anom.clim = dplyr::bind_rows(glorys.season.epu) %>%
+  data.all.anom.clim =glorys.season.epu.all %>%
     dplyr::filter(year %in% seq(ref.year.start,ref.year.end)) %>%
     dplyr::group_by(time,area)%>%
     dplyr::summarise(value.clim = mean(value,na.rm=T))

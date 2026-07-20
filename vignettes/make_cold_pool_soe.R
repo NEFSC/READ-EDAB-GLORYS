@@ -1,8 +1,10 @@
 
-source(here::here('data-raw','format_ROMS_coldpool.R'))
-
-EDAB.GLORYS::make_cold_pool_data(input.files = list.files('C:/Users/joseph.caracappa/Documents/Data/GLORYS/GLORYS_daily/','GLORYS_daily_BottomTemp_',full.names = T),
-                    output.dir = here::here('data','cold_pool','GLORYS','/'),
+# source(here::here('data-raw','format_ROMS_coldpool.R'))
+glorys.files = list.files('/home/jcaracappa/EDAB_Datasets/GLORYS/glorys_bottomT/cmems_mod_glo_phy_my_0.083deg_P1D-m/bottomT_NEUS/',full.names =T)
+EDAB.GLORYS::make_cold_pool_data(
+                    # input.files = list.files('C:/Users/joseph.caracappa/Documents/Data/GLORYS/GLORYS_daily/','GLORYS_daily_BottomTemp_',full.names = T),
+                    input.files = glorys.files,
+                    output.dir = '/home/jcaracappa/EDAB_Dev/jcaracappa/glorys_my_soe/data/cold_pool/',
                     output.prefix = 'glorys_cold_pool_',
                     cp.shp.file = here::here('data-raw','geometry','cold_pool_area_GLORYS.shp')
 )

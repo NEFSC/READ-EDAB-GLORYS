@@ -29,6 +29,7 @@ make_bottom_temp_model_anom = function(input.file,
   
   # Create Seasonal Bottom Temp Anomalies
   ##GLORYS
+  tictoc::tic()
   glorys.season.epu = EDABUtilities::make_2d_summary_ts(data.in = input.file,
                                                         write.out =F,
                                                         shp.file = shp.file,
@@ -36,9 +37,11 @@ make_bottom_temp_model_anom = function(input.file,
                                                         agg.time = 'season',
                                                         statistic = 'mean',
                                                         touches =F,
-                                                        file.time = 'annual',
+                                                        file.time = 'daily',
                                                         area.names = c('MAB','GB','GOM','SS')
+                                                        
   )
+  tictoc::toc()
   
   glorys.season.epu = dplyr::mutate(glorys.season.epu[[1]], year = file.year, Var = 'GLORYS')
   
