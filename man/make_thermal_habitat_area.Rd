@@ -2,7 +2,7 @@
 % Please edit documentation in R/make_thermal_habitat_area.R
 \name{make_thermal_habitat_area}
 \alias{make_thermal_habitat_area}
-\title{Createst the thermal_habitat_gridded inidcator for the State of the Ecosystem Report}
+\title{Creates the thermal_habitat_gridded indicator for the State of the Ecosystem Report}
 \usage{
 make_thermal_habitat_area(
   input.file,
@@ -16,7 +16,8 @@ make_thermal_habitat_area(
 )
 }
 \arguments{
-\item{input.file}{Either a character vector of full input file names for a list of spatrasters}
+\item{input.file}{Character. Either a single path to a NetCDF file with multiple time layers,
+or a character vector of file paths (e.g. daily files) to be combined.}
 
 \item{output.file.area}{character with full file name for thermal_habitat_area output csv}
 
