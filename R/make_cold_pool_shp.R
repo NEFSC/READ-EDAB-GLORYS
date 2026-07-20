@@ -8,7 +8,7 @@
 #' 
 #' @return .shp with cold pool detection area
 #' 
-#' @importFrom magrittr "|>"
+
 #' 
 #' @export
 #' 

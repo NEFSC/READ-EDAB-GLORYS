@@ -11,7 +11,7 @@
 #' 
 #' @return a dataframe (Time, Latitude, Longitude, var, value) or csv file of the gridded data
 #' 
-#' @importFrom magrittr "|>"
+
 #' 
 #' @export
 #' 

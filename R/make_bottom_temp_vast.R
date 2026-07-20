@@ -11,7 +11,7 @@
 #' 
 #' @return Annual RDS file with the processed data for GLORYS and ROMS (mod_bt longitude latitude time date year month day)
 #' 
-#' @importFrom magrittr "|>"
+
 #' 
 #' @export
 #' 

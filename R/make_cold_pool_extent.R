@@ -9,7 +9,7 @@
 #' 
 #' @return RDS file with the annual and maximum cold pool extent
 #' 
-#' @importFrom magrittr "|>"
+
 #' 
 #' @export
 #' 

@@ -8,7 +8,7 @@
 #' 
 #' @return csv with cold pool indices
 #' 
-#' @importFrom magrittr "|>"
+
 #' 
 #' @export
 #' 
