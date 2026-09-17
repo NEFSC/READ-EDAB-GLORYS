@@ -38,9 +38,12 @@ make_gridded_climatology = function(input.dir,
                           full.names = T)
   
   #Retreive years from file names
-  glorys.years = as.numeric(gsub(".*(\\d{4}).*", '\\1', data.files))
+  glorys.dates = gsub(".*(\\d{8}).*", '\\1', data.files) |> as.Date(format = '%Y%m%d')
+  glorys.years = glorys.dates |> format('%Y')
   data.files.sub = data.files[which(glorys.years>=ref.year.start & glorys.years<=ref.year.end)]
-  
+  # start.date = min(glorys.dates[which(glorys.years>=ref.year.start & glorys.years<=ref.year.end)])
+  # end.date = max(glorys.dates[which(glorys.years>=ref.year.start & glorys.years<=ref.year.end)])
+  # 
   #Seasonal means by epu for all reference years
   # unique.years = ref.year.start:ref.year.end
   # for(i in 1:length(unique.years)){
@@ -71,7 +74,9 @@ make_gridded_climatology = function(input.dir,
   data.all.anom.clim =glorys.season.epu.all |>
     dplyr::filter(year %in% seq(ref.year.start,ref.year.end)) |>
     dplyr::group_by(time,area)|>
-    dplyr::summarise(value.clim = mean(value,na.rm=T))
+    dplyr::summarise(value.clim = mean(value,na.rm=T)) 
+    # dplyr::mutate(start.date = start.date,
+                  # end.date = end.date)+
   
   if(write.out){
     write.csv(data.all.anom.clim,output.file,row.names = F)

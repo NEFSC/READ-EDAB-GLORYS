@@ -15,7 +15,7 @@
 
 make_cold_pool_indices = function(input.data, cp.extent.file,output.dir){
   
-  cp_max_extent = readRDS(cp.extent.file)
+  cp_max_extent = read.csv(cp.extent.file)
   cp.months = 6:9
   
   #Calculate Cold Pool Indices
@@ -152,8 +152,14 @@ make_cold_pool_indices = function(input.data, cp.extent.file,output.dir){
     dplyr::inner_join(dplyr::select(dt_persistence_index_soe,year,persistence_index,se_persistence_index), by="year") |>
     dplyr::inner_join(dplyr::select(dt_extent_index_soe,year,extent_index,se_extent_index), by="year") |>
     dplyr::select(year,cold_pool_index,se_cold_pool_index,persistence_index,se_persistence_index,extent_index,se_extent_index)
-  write.csv(file=paste0(output.dir,"cold_pool_indices_",year.min,"_",year.max,".csv"),x=dt_cp)
+  
+  cp.index.file = paste0(output.dir,"cold_pool_indices_",year.min,"_",year.max,".csv")
+  write.csv(file=cp.index.file,x=dt_cp)
 
+  out.ls = list(cp.index.file = cp.index.file,
+                year.start = year.min,
+                year.end = year.max)
+  return(out.ls)
   # #Test vs ecodata
   # soe23 = read.csv('C:/Users/joseph.caracappa/Documents/GitHub/bottom_temp_SOE/data/SOE/cold_pool_indices_1959_2023.csv')|>
   #   filter(source %in% c("GLORYS","ROMS")) |>

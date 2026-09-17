@@ -71,10 +71,10 @@ make_thermal_habitat_gridded = function(input.file, output.file,supp.dir, shp.fi
                                        area.names =NA
     )
     
-    out.ls[[t]] = EDABUtilities::make_2d_deg_day_gridded_nc(data.in = area.i,
+    out.ls[[t]] = EDABUtilities::make_2d_deg_day_gridded(data.in = area.i,
                                                             shp.file = EPU.vect,
                                                             var.name = 'BottomT',
-                                                            statistic = 'nd',
+                                                            metric = 'nd',
                                                             type = 'above',
                                                             ref.value = t.max.seq[t],
                                                             area.names = NA
@@ -106,9 +106,9 @@ make_thermal_habitat_gridded = function(input.file, output.file,supp.dir, shp.fi
   
   #Format netcdf
   var.atts = read.csv(paste0(supp.dir,'GLORYS/thermal_habitat_gridded_variable_attributes.csv')) |>
-    filter(!is.na(Value) & Attribute.Name != '_FillValue')
+    dplyr::filter(!is.na(Value) & Attribute.Name != '_FillValue')
   global.atts = read.csv(paste0(supp.dir,'GLORYS/thermal_habitat_gridded_global_attributes.csv'))|>
-    filter(!is.na(Value))
+    dplyr::filter(!is.na(Value))
   
   file.nc = ncdf4::nc_open(output.file,write =T)
   file.var = names(file.nc$var)

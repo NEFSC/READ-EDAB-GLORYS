@@ -62,17 +62,26 @@ make_thermal_habitat_area = function(input.file, output.file.area = NA, output.f
     if(i ==1){
       # Refactor: use processed_rast instead of loading from file again
       neus.shp = terra::crop(bathy.shp, processed_rast)
+      
     }
     
     depth.rast = terra::clamp(neus.shp, lower = combs$depth.min[i], upper = combs$depth.max[i],values =F)
     EPU.vect = terra::vect(shp.file)
     area.vect = EPU.vect[which(EPU.vect$EPU %in% area.names)]
     
-    area.mask = terra::mask(depth.rast,area.vect)
+    area.mask = terra::crop(terra::mask(depth.rast,area.vect),area.vect)
+    area.mask = terra::as.polygons(area.mask, dissolve =T)
     
     #Mask of area over t.max
     # Refactor: Pass the SpatRaster object (processed_rast) instead of filename
-    area.i = EDABUtilities::mask_nc_2d(data.in = processed_rast,
+    area.i = EDABUtilities::crop_nc_2d(data.in = processed_rast,
+                                       write.out =F,
+                                       shp.file = area.vect,
+                                       var.name = 'BottomT',
+                                       area.names =NA
+    )
+    
+    area.j = EDABUtilities::mask_nc_2d(data.in = area.i,
                                        write.out =F,
                                        shp.file = area.mask,
                                        var.name = 'BottomT',
@@ -85,18 +94,18 @@ make_thermal_habitat_area = function(input.file, output.file.area = NA, output.f
     # Refactor: Subset from the main raster object
     this.rast = terra::subset(processed_rast, 1)
     
-    nd.i = EDABUtilities::make_2d_deg_day_gridded_nc(data.in = area.i,
+    nd.i = EDABUtilities::make_2d_deg_day_gridded(data.in = area.j,
                                                      shp.file = area.mask,
                                                      var.name = 'BottomT',
-                                                     statistic = 'nd',
+                                                     metric = 'nd',
                                                      type = 'above',
                                                      ref.value = combs$t.max[i],
                                                      area.names = NA
     )
     
-    shp.area = terra::expanse(area.mask)$area
+    shp.area = sum(terra::expanse(area.mask))
     
-    area.df = terra::expanse(area.i[[1]]) |>
+    area.df = terra::expanse(area.j[[1]]) |>
       as.data.frame()|>
       dplyr::mutate(Time = terra::time(area.i[[1]]),
                     EPU = combs$EPU[i],

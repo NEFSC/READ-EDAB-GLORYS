@@ -17,7 +17,7 @@
 #change to full input files instead of glorys/roms
 
 
-make_cold_pool_extent = function(input.data,output.dir,shp.file,grid.file){
+make_cold_pool_extent = function(input.data,output.dir,shp.file,grid.file,write.out = F){
   
   cp.months = 6:9
   
@@ -39,7 +39,8 @@ make_cold_pool_extent = function(input.data,output.dir,shp.file,grid.file){
   
   cp_max_extent =cbind(cp_max_extent,terra::xyFromCell(cp.grid,cell = cp_max_extent$cell))
   
-  saveRDS(cp_max_extent,paste0(output.dir,'cold_pool_maximum_extent_',year.min,'_',year.max,'.rds'))
+  max_extent_file = paste0(output.dir,'cold_pool_maximum_extent_',year.min,'_',year.max,'.csv')
+  write.csv(cp_max_extent,max_extent_file)
   # ggplot(cp_max_extent,aes(x=x,y=y,fill= avg_bottom_t))+
   #   geom_tile()
   
@@ -53,11 +54,18 @@ make_cold_pool_extent = function(input.data,output.dir,shp.file,grid.file){
   
   cp_annual_extent =cbind(cp_annual_extent,terra::xyFromCell(cp.grid,cell = cp_annual_extent$cell))
   
-  saveRDS(cp_max_extent,paste0(output.dir,'cold_pool_annual_extent_',year.min,'_',year.max,'.rds'))
+  annual_extent_file = paste0(output.dir,'cold_pool_annual_extent_',year.min,'_',year.max,'.csv')
+  write.csv(cp_annual_extent,annual_extent_file)
   # ggplot(cp_annual_extent,aes(x=x,y=y,fill= avg_bottom_t))+
   #   geom_tile()+
   #   facet_wrap(~year)
 
+  out.ls = list(max_extent_file =max_extent_file,
+                annual_extent_file = annual_extent_file,
+                year.start = year.min,
+                year.end = year.max)
+  
+  return(out.ls)
   
 }
 

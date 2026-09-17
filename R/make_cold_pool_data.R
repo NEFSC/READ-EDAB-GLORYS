@@ -6,13 +6,13 @@
 #' @param output.dir Full output file directory
 #' @param output.prefix string. Prefix for the output files
 #' @param cp.shp.file Full input file directory for the cold pool area shape file
+#' @param write.out if TRUE writes to file
 #' 
 #' @return RDS file with the processed data for GLORYS and ROMS
 #' 
 #' @export
 #' 
-
-make_cold_pool_data = function(input.files, output.dir,output.prefix,cp.shp.file,redo =F){
+make_cold_pool_data = function(input.files, output.dir,output.prefix,cp.shp.file,redo =F,write.out = F){
 
   #Read cold pool detection area shape file
   cp.shp  = terra::vect(cp.shp.file)
@@ -20,6 +20,7 @@ make_cold_pool_data = function(input.files, output.dir,output.prefix,cp.shp.file
   i=1
   data.ls = list()
   data.df.ls = list()
+  data.nc.ls =list()
   file.years = numeric()
   
   for(i in 1:length(input.files)){
@@ -45,12 +46,25 @@ make_cold_pool_data = function(input.files, output.dir,output.prefix,cp.shp.file
       dplyr::group_by(year,month,cell)|>
       dplyr::summarise(value = mean(value,na.rm=T))
     
-    terra::writeCDF(data.crop,varname = 'BottomT',filename =paste0(output.dir,output.prefix,file.years[i],'.nc'),overwrite =T)
+    if(write.out){
+      terra::writeCDF(data.crop,varname = 'BottomT',filename =paste0(output.dir,output.prefix,file.years[i],'.nc'),overwrite =T)  
+    }else{
+      data.nc.ls[[i]] = data.crop
+    }
+    
   
   }
   
   glorys.df = dplyr::bind_rows(data.df.ls)
-  saveRDS(glorys.df,paste0(output.dir,output.prefix,'monthly_',file.years[1],'_',file.years[length(file.years)],'.rds'))
+  
+  if(write.out){
+    saveRDS(glorys.df,paste0(output.dir,output.prefix,'monthly_',file.years[1],'_',file.years[length(file.years)],'.rds'))  
+  }else{
+    out.ls = list(data.frame = glorys.df,
+                  data.nc = data.nc.ls)
+    return(out.ls)
+  }
+  
   
   
 }
