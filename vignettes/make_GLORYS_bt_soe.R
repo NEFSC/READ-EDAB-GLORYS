@@ -239,7 +239,6 @@ ggplot(data, aes(x = year, y = Value, color = source))+
   facet_grid(EPU~season)
 ggsave(here::here('GLORYS_bottom_temp_2025.png'),width =12, height = 12)
 
-
 model.anom.files = list.files(paste0(output.dir,'data/bottom_temp_model_anom/'),full.names = T)
 model.anom.data = lapply(model.anom.files, read.csv) |>
   dplyr::bind_rows() |>
@@ -270,3 +269,42 @@ thermal.gridded.files = list.files(path = paste0(output.dir,'data/thermal_habita
 thermal.gridded.data = lapply(thermal.gridded.files, read.csv) |>
   dplyr::bind_rows()
 saveRDS(thermal.gridded.data, file = paste0(indicator.dir,'GLORYS_thermal_habitat_gridded_1993_2025.rds'))
+
+##Combine all outputs to a single year and save to EDAB_Indicators
+soe.dir = 'V:/'
+
+library(ggplot2)
+
+#bottom_temp_model_anom
+bt.anom.dir = 'X:/jcaracappa/glorys_my_soe/data/bottom_temp_model_anom/'
+bt.anom.files = list.files(bt.anom.dir, full.name = T)
+bt.anom.data = lapply(bt.anom.files,read.csv) |> dplyr::bind_rows()
+ggplot(bt.anom.data, aes(x = Time, y = Value, color = Source))+
+  geom_line()+
+  facet_wrap(~Var)
+saveRDS(bt.anom.data, paste0(soe.dir,'GLORYS_bottom_temp_model_anom_1993_2025.rds'))
+
+#bottom_temp_model_gridded
+bt.gridded.dir = 'X:/jcaracappa/glorys_my_soe/data/bottom_temp_model_gridded/'
+bt.gridded.files = list.files(bt.gridded.dir, full.name = T)
+bt.gridded.data = lapply(bt.gridded.files,read.csv) |> dplyr::bind_rows()
+saveRDS(bt.gridded.data, paste0(soe.dir,'GLORYS_bottom_temp_model_gridded_1993_2025.rds'))
+
+#bottom_temp_model_annual
+bt.annual.dir = 'X:/jcaracappa/glorys_my_soe/data/bottom_temp_model_annual/'
+bt.annual.files = list.files(bt.annual.dir, full.name = T)
+bt.annual.data = lapply(bt.annual.files,read.csv) |> dplyr::bind_rows()
+saveRDS(bt.annual.data, paste0(soe.dir, 'GLORYS_bottom_temp_model_annual_1993_2025.rds'))
+
+#thermal_habitat_area
+tha.dir = 'X:/jcaracappa/glorys_my_soe/data/thermal_habitat_area/'
+tha.files = list.files(tha.dir,full.name = T)
+tha.data = lapply(tha.files,read.csv) |> dplyr::bind_rows()
+saveRDS(tha.data, paste0(soe.dir, 'GLORYS_thermal_habitat_area_1993_2005.rds'))
+
+#thermal_habitat_gridded
+thg.dir = 'X:/jcaracappa/glorys_my_soe/data/thermal_habitat_gridded/'
+thg.files = list.files(thg.dir,'*.csv', full.name = T)
+thg.data = lapply(thg.files,read.csv) |> dplyr::bind_rows()
+saveRDS(thg.data, paste0(soe.dir, 'GLORYS_thermal_habitat_gridded_1993_2025.rds'))
+
