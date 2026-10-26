@@ -10,7 +10,8 @@ make_bottom_temp_strata(
   shp.file,
   var.name,
   strata,
-  statistics = "mean",
+  statistic.temporal = "mean",
+  statistics.spatial = "mean",
   write.out = T
 )
 }
@@ -25,9 +26,9 @@ make_bottom_temp_strata(
 
 \item{strata}{list. Named list with item name the corresponding column in shape file with vectors of BTS Strata IDs to extract}
 
-\item{statistics}{character.statistics to extract}
-
 \item{write.out}{logical. If TRUE, the function will write out the gridded data to a netcdf file}
+
+\item{statistics}{character.statistics to extract}
 }
 \value{
 a dataframe (Time, Latitude, Longitude, var, value) or csv file of the gridded data

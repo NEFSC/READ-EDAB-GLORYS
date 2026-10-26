@@ -22,7 +22,8 @@ make_bottom_temp_strata <- function(
   shp.file,
   var.name,
   strata,
-  statistics = 'mean',
+  statistic.temporal = 'mean',
+  statistics.spatial = 'mean',
   write.out = T
 ) {
   shp <- terra::vect(shp.file)
@@ -42,7 +43,8 @@ make_bottom_temp_strata <- function(
       shp.file = this.shp,
       var.name = var.name,
       agg.time = 'days',
-      statistics = statistics,
+      statistics.spatial = statistics.spatial,
+      statistic.temporal = statistic.temporal,
       touches = F,
       file.time = 'daily',
       area.names = this.strata
