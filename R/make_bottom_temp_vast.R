@@ -16,22 +16,25 @@
 #' @export
 #'
 
-input.index <- data.frame(
-  series = c('ROMS_debiased', 'cmems_mod_glo_phy_my_0.083deg_P1D-m'),
-  dir.name = c(
-    '//nefscdata/EDAB_Datasets/ROMS_NWA/',
-    '//nefscdata/EDAB_Datasets/GLORYS/V12/SOURCE/NES_9KM_DAILY/GLOBAL_MULTIYEAR_PHY_001_030/BOTTOMT/'
-  ),
-  start.year = c(1959, 1993),
-  end.year = c(1992, 2026)
-)
-output.dir <- '//nefscdata/EDAB_Datasets/GLORYS/V12/PRODUCTS/annual_bottomT_vast/V2/'
-output.prefix <- 'ROMS_GLORYS_bt_VAST_'
-shp.file <- '//nefscdata/EDAB_Resources/workflow_resources/shapefiles/EPU_NOESTUARIES.shp'
-i <- yr <- f <- 1
-origin <- '1950-01-01'
-time.unit <- 'days'
-redo <- F
+# root.dir = '//nefscdata/'
+# root.dir = '/home/jcaracappa/'
+# input.index <- data.frame(
+#   series = c('ROMS_debiased', 'cmems_mod_glo_phy_my_0.083deg_P1D-m'),
+#   dir.name = c(
+#     paste0(root.dir,'EDAB_Datasets/ROMS_NWA/'),
+#     paste0(root.dir,'EDAB_Datasets/GLORYS/V12/SOURCE/NES_9KM_DAILY/GLOBAL_MULTIYEAR_PHY_001_030/BOTTOMT/')
+#   ),
+#   start.year = c(1959, 1993),
+#   end.year = c(1992, 2026),
+#   multiyear = c(T, F)
+# )
+# output.dir <- paste0(root.dir,'EDAB_Datasets/GLORYS/V12/PRODUCTS/annual_bottomT_vast/V3/')
+# output.prefix <- 'ROMS_GLORYS_bt_VAST_'
+# shp.file <- paste0(root.dir,'EDAB_Resources/workflow_resources/shapefiles/EPU_NOESTUARIES.shp')
+# i <- yr <- f <- 1
+# origin <- '1950-01-01'
+# time.unit <- 'days'
+# redo <- F
 
 make_bottom_temp_temp_vast <- function(
   input.index,
@@ -55,22 +58,24 @@ make_bottom_temp_temp_vast <- function(
       path = input.index$dir.name[i],
       full.names = T
     )
-    series.files.year.match <- regmatches(
-      series.files,
-      gregexpr("\\d{4}", series.files)
-    )
-
-    # Convert the strings to numbers
-    series.files.year <- lapply(series.files.year.match, as.numeric)
-    multi.year.files <- any(unlist(lapply(series.files.year, function(x) {
-      length(x) > 1
-    })))
+    
+    if(input.index$multiyear[i] == T){
+      series.files.year.match <- regmatches(
+        series.files,
+        gregexpr("\\d{4}", series.files)
+      )
+      series.files.year <- lapply(series.files.year.match, as.numeric)
+    }else{
+      series.files.year <- as.numeric(
+        gsub(".*-(\\d{4})\\d{4}\\.nc$", "\\1", basename(series.files))
+      )
+    }
 
     for (yr in 1:length(year.seq)) {
       is.leap.year <- ((year.seq[yr] %% 4 == 0) & (year.seq[yr] %% 100 != 0)) |
         (year.seq[yr] %% 400 == 0)
 
-      if (multi.year.files == T) {
+      if (input.index$multiyear[i] == T) {
         #Create of list of year sequences based on series.files.year
         file.year.ls <- lapply(series.files.year, function(x) {
           seq(min(x), max(x))
@@ -84,20 +89,24 @@ make_bottom_temp_temp_vast <- function(
       }))
       this.year.files <- series.files[this.year.file.match]
 
+      this.output.file <- paste0(
+        output.dir,
+        output.prefix,
+        year.seq[yr],
+        '.rds'
+      )
+      
+      if (redo == F & file.exists(this.output.file)) {
+        message(this.year.files[f], ' already exists. Skipping...')
+        next()
+      } else {
+        message('Starting: ', this.output.file)
+      }
+      
       this.year.ls <- list()
       for (f in 1:length(this.year.files)) {
-        this.output.file <- paste0(
-          output.dir,
-          output.prefix,
-          year.seq[yr],
-          '.rds'
-        )
-        if (redo == F & file.exists(this.output.file)) {
-          message(this.output.file, ' already exists. Skipping...')
-          next()
-        } else {
-          message('Starting: ', this.output.file)
-        }
+        
+      
         file.data <- terra::crop(
           terra::rast(
             this.year.files[f],
@@ -114,7 +123,7 @@ make_bottom_temp_temp_vast <- function(
 
         file.time <- terra::time(file.data)
         #If all time vars are empty probably formated for ROMS data with year and day in the variable name
-        if (all(is.na(file.time))) {
+        if (all(is.na(file.time)|file.time == 0)) {
           #Get data names and years
           var.year <- as.numeric(gsub(
             ".*(\\d{4}).*",
@@ -201,7 +210,8 @@ make_bottom_temp_temp_vast <- function(
               year = as.numeric(format(date, format = '%Y')),
               month = as.numeric(format(date, format = '%m')),
               day = as.numeric(format(date, format = '%j'))
-            )
+            ) 
+            
         } else {
           file.date <- as.Date(terra::time(file.data))
           file.data.df <- terra::as.data.frame(file.data, xy = T, na.rm = T) |>
@@ -219,7 +229,10 @@ make_bottom_temp_temp_vast <- function(
           colnames(file.data.df)[3] <- 'mod_bt'
         }
 
-        print(this.year.files[f])
+        if(f %% 100 == 0){
+          print(this.year.files[f])  
+        }
+        
         this.year.ls[[f]] <- file.data.df
       }
       saveRDS(dplyr::bind_rows(this.year.ls), this.output.file)
