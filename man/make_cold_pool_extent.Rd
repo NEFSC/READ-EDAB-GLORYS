@@ -4,7 +4,13 @@
 \alias{make_cold_pool_extent}
 \title{Creates the maximum extent of the cold pool over the input data}
 \usage{
-make_cold_pool_extent(input.data, output.dir, shp.file, grid.file)
+make_cold_pool_extent(
+  input.data,
+  output.dir,
+  shp.file,
+  grid.file,
+  write.out = F
+)
 }
 \arguments{
 \item{input.data}{data.frame formatted by make_cold_pool_data}
