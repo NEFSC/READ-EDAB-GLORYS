@@ -5,6 +5,7 @@
 #' @param input.files Either a character vector of full input file names for a list of spatrasters
 #' @param output.file character vector of full output file names corresponding to each element of strata
 #' @param shp.file  string. Shape file you wish to crop each input file to
+#' @param var.name string. name of the variable to extract
 #' @param strata list. Named list with item name the corresponding column in shape file with vectors of BTS Strata IDs to extract
 #' @param statistics character.statistics to extract
 #' @param write.out logical. If TRUE, the function will write out the gridded data to a netcdf file
@@ -19,6 +20,7 @@ make_bottom_temp_strata <- function(
   input.files,
   output.file,
   shp.file,
+  var.name,
   strata,
   statistics = 'mean',
   write.out = T
@@ -38,7 +40,7 @@ make_bottom_temp_strata <- function(
       data.in = input.files,
       write.out = F,
       shp.file = this.shp,
-      var.name = 'bottomT',
+      var.name = var.name,
       agg.time = 'days',
       statistics = statistics,
       touches = F,

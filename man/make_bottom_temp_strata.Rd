@@ -8,6 +8,7 @@ make_bottom_temp_strata(
   input.files,
   output.file,
   shp.file,
+  var.name,
   strata,
   statistics = "mean",
   write.out = T
@@ -19,6 +20,8 @@ make_bottom_temp_strata(
 \item{output.file}{character vector of full output file names corresponding to each element of strata}
 
 \item{shp.file}{string. Shape file you wish to crop each input file to}
+
+\item{var.name}{string. name of the variable to extract}
 
 \item{strata}{list. Named list with item name the corresponding column in shape file with vectors of BTS Strata IDs to extract}
 
