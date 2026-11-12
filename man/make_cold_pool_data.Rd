@@ -6,6 +6,7 @@
 \usage{
 make_cold_pool_data(
   input.files,
+  file.time = "daily",
   output.dir,
   output.prefix,
   cp.shp.file,
@@ -15,6 +16,8 @@ make_cold_pool_data(
 }
 \arguments{
 \item{input.files}{Full input file directory for bottom temp data}
+
+\item{file.time}{character. Either 'daily' or 'annual' layers in file}
 
 \item{output.dir}{Full output file directory}
 

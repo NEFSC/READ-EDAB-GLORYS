@@ -71,19 +71,22 @@ make_thermal_habitat_gridded = function(input.file, output.file,supp.dir, shp.fi
                                        area.names =NA
     )
     
-    out.ls[[t]] = EDABUtilities::make_2d_deg_day_gridded(data.in = area.i,
+    area.dd = EDABUtilities::make_2d_deg_day_gridded(data.in = area.i,
                                                             shp.file = EPU.vect,
                                                             var.name = 'BottomT',
                                                             metric = 'nd',
                                                             type = 'above',
                                                             ref.value = t.max.seq[t],
                                                             area.names = NA
-    )[[1]]
+    )
     
-    out.ls[[t]] = out.ls[[t]] *terra::crop(epu.mask.binary, out.ls[[t]])
+    out.ls[[t]] = terra::rast(area.dd)
     
-    year.time = as.POSIXct(paste0(file.year, '-01-01 00:00:00UTC'),origin = '1970-01-01 00:00:00',tz = 'UTC')
-    terra::time(out.ls[[t]]) = as.numeric(year.time)
+    out.ls[[t]] = out.ls[[t]] * terra::crop(epu.mask.binary, out.ls[[t]])
+    
+    
+    year.time =as.Date(time(out.ls[[t]]))
+    terra::time(out.ls[[t]]) = year.time
     
     print(signif(t/length(t.max.seq) ,2))
     

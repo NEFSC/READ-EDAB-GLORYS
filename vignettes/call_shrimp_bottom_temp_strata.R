@@ -1,5 +1,5 @@
 root.dir <- '/home/jcaracappa/'
-root.dir <- '//nefscdata/'
+# root.dir <- '//nefscdata/'
 
 data.dir <- paste0(
   root.dir,
@@ -42,7 +42,7 @@ output.prefix <- 'bottom_temp_shrimp_strata_'
 years <- sort(unique(input.files.year))
 
 i <- 1
-for (i in 2:length(years)) {
+for (i in 1:length(years)) {
   this.year.input <- input.files[which(input.files.year == years[i])]
 
   this.output <- paste0(output.dir, output.prefix, years[i], '.csv')
@@ -107,7 +107,8 @@ for (i in 1:length(roms.years)) {
     shp.file = shp.file,
     var.name = 'sea_water_temperature_at_sea_floor',
     strata = strata,
-    statistics = c('mean', 'sd'),
+    statistic.temporal = 'mean',
+    statistics.spatial = c('mean', 'sd'),
     write.out = T
   )
 }
@@ -119,7 +120,7 @@ out.df <- lapply(out.files, read.csv) |>
   dplyr::rename(
     date = 'time',
     strata = 'area',
-    variable = 'statistics',
+    variable = 'statistics.spatial',
     bottom_temp = 'value'
   ) |>
   dplyr::select(date, strata, variable, bottom_temp)
@@ -131,24 +132,29 @@ write.csv(
   paste0(
     root.dir,
     'EDAB_Dev/jcaracappa/shrimp_strata/GLORYS_bottom_temp_shrimp_strata_2026_assessment.csv'
-  )
+  ),
+  row.names = F
 )
 
 library(ggplot2)
 
-out.df <- read.csv(paste0(
-  root.dir,
-  'EDAB_Dev/jcaracappa/shrimp_strata/GLORYS_bottom_temp_shrimp_strata_2026_assessment.csv'
-))
+# out.df <- read.csv(paste0(
+#   root.dir,
+#   'EDAB_Dev/jcaracappa/shrimp_strata/GLORYS_bottom_temp_shrimp_strata_2026_assessment.csv'
+# ))
 strata.names <- unique(out.df$strata)
 
+pdf(paste0(root.dir,'EDAB_Dev/jcaracappa/shrimp_strata/GLORYS_bottom_temp_shrimp_strata_2026_assessment.pdf'))
 for (i in 1:length(strata.names)) {
   this.strata <- out.df |>
     dplyr::filter(strata == strata.names[i]) |>
     tidyr::pivot_wider(names_from = variable, values_from = bottom_temp) |>
     dplyr::mutate(date = as.Date(date))
 
-  ggplot(this.strata, aes(x = date, y = mean)) +
-    geom_path() +
-    ggtitle('STRATA: ', strata.names[i])
+  p = ggplot(this.strata, aes(x = date, y = mean)) +
+    geom_line() +
+    ggtitle(paste0('STRATA: ', strata.names[i]))
+  
+  print(p)
 }
+dev.off()

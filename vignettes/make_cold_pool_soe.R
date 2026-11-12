@@ -19,7 +19,8 @@ rm(glorys.data,roms.data)
 make_cold_pool_extent(input.data = input.data,
                       output.dir = here::here('data','cold_pool','/'),
                       shp.file = here::here('data-raw','geometry','cold_pool_area.shp'),
-                      grid.file = here::here('data','cold_pool','roms_cold_pool_grid.nc')
+                      grid.file = here::here('data','cold_pool','roms_cold_pool_grid.nc'),
+                      write.out = T
 )
 make_cold_pool_indices(input.data = input.data,
                        cp.extent.file = here::here('data','cold_pool','cold_pool_maximum_extent_1959_2024.rds'),

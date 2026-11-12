@@ -31,9 +31,10 @@ make_bottom_temp_model_gridded = function(input.file,
                                          write.out = F,
                                          output.files = output.file,
                                          shp.file = shp.file,
+                                         file.time = 'daily',
                                          var.name = 'BottomT',
                                          agg.time = 'season',
-                                         statistic = 'mean',
+                                         statistics = 'mean',
                                          area.names = c('MAB','GB','GOM','SS')
   )[[1]]
   
