@@ -566,7 +566,7 @@ for (y in 1:length(run.years)) {
       registry.file,
       dataset.name = paste0('bt_epu_', run.years[y])
     )
-  } else if (!bt.epu.check$same.input.date) {
+  } else if (!bt.epu.check$same.input.date | !bt.epu.check$file.exists) {
     bt.epu.df <- EDAB.GLORYS::make_bottom_temp_daily_epu(
       input.file = this.year.files,
       output.file = bt.epu.file,
@@ -594,164 +594,164 @@ for (y in 1:length(run.years)) {
     }
   }
 
-  # #Make thermal_habitat_gridded----
-  print(paste0(
-    'Starting thermal_habitat_gridded for year: ',
-    run.years[y],
-    ' at ',
-    Sys.time()
-  ))
-
-  th.grid.prefix <- 'GLORYS_thermal_habitat_gridded_'
-  th.grid.file <- paste0(
-    mount.dir,
-    sub.dir,
-    '/thermal_habitat_gridded/',
-    th.grid.prefix,
-    run.years[y],
-    '.nc'
-  )
-  check.dir(th.grid.file)
-
-  th.grid.check <- check.date.file(
-    registry.file,
-    dataset.name = paste0('th_grid_', run.years[y]),
-    input.dates = file.dates,
-    mount.dir = mount.dir
-  )
-
-  if (th.grid.check$file.exists & th.grid.check$same.input.date) {
-    message(
-      'thermal_habitat_gridded_',
-      run.years[y],
-      ' already exists and is up to date. Skipping.'
-    )
-    th.grid.file <- get_recent_file(
-      registry.file,
-      dataset.name = paste0('th_grid_', run.years[y])
-    )
-  } else if (!th.grid.check$same.input.date | !th.grid.check$file.exists) {
-    EDAB.GLORYS::make_thermal_habitat_gridded(
-      input.file = this.year.files,
-      output.file = th.grid.file,
-      supp.dir = supp.dir,
-      shp.file = shp.file,
-      file.year = run.years[y],
-      write.out = T,
-      # t.max.seq = c(0,1)
-      t.max.seq = seq(0, 30, 1)
-    )
-
-    # write.csv(th.grid.df, th.grid.file, row.names = F)
-    if (!th.grid.check$same.run.date) {
-      append.registry(
-        dataset.name = paste0('th_grid_', run.years[y]),
-        file.name = th.grid.file,
-        registry.file = registry.file,
-        input.dates = file.dates,
-        mount.dir = mount.dir,
-        sub.dir = paste0(sub.dir, 'thermal_habitat_gridded/')
-      )
-    } else {
-      message(
-        'thermal_habitat_gridded_',
-        run.years[y],
-        ' already exists but input files have changed. Overwriting with new data. No registry Change'
-      )
-    }
-  }
-
-  # #Make thermal_habitat_area----
-  print(paste0(
-    'Starting thermal_habitat_area for year: ',
-    run.years[y],
-    ' at ',
-    Sys.time()
-  ))
-
-  th.area.prefix <- 'GLORYS_thermal_habitat_area_'
-  th.grid.csv.prefix <- 'GLORYS_thermal_habitat_gridded_'
-  th.area.file <- paste0(
-    mount.dir,
-    sub.dir,
-    '/thermal_habitat_area/',
-    th.area.prefix,
-    run.years[y],
-    '.csv'
-  )
-  th.area.grid.csv.file <- paste0(
-    mount.dir,
-    sub.dir,
-    '/thermal_habitat_gridded/',
-    th.grid.csv.prefix,
-    run.years[y],
-    '.csv'
-  )
-  check.dir(th.area.file)
-  check.dir(th.area.grid.csv.file)
-
-  th.area.check <- check.date.file(
-    registry.file,
-    dataset.name = paste0('th_area_', run.years[y]),
-    input.dates = file.dates,
-    mount.dir = mount.dir
-  )
-
-  if (th.area.check$file.exists & th.area.check$same.input.date) {
-    message(
-      'thermal_habitat_area_',
-      run.years[y],
-      ' already exists and is up to date. Skipping.'
-    )
-    th.area.file <- get_recent_file(
-      registry.file,
-      dataset.name = paste0('th_area_', run.years[y])
-    )
-    th.area.grid.csv.file <- get_recent_file(
-      registry.file,
-      dataset.name = paste0('th_grid_csv_', run.years[y])
-    )
-  } else if (!th.area.check$same.input.date | !th.area.check$file.exists) {
-    th.area.df <- EDAB.GLORYS::make_thermal_habitat_area(
-      input.file = this.year.files,
-      output.file.area = th.area.file,
-      output.file.gridded = th.area.grid.csv.file,
-      shp.file = shp.file,
-      file.year = run.years[y],
-      write.area = F,
-      write.gridded = F,
-      t.max.seq = seq(0, 30, 1)
-      # t.max.seq = c(0,1)
-    )
-
-    write.csv(th.area.df$thermal.area, th.area.file, row.names = F)
-    write.csv(th.area.df$thermal.gridded, th.area.grid.csv.file, row.names = F)
-
-    if (!th.area.check$same.run.date) {
-      append.registry(
-        dataset.name = paste0('th_area_', run.years[y]),
-        file.name = th.area.file,
-        registry.file = registry.file,
-        input.dates = file.dates,
-        mount.dir = mount.dir,
-        sub.dir = paste0(sub.dir, 'thermal_habitat_area/')
-      )
-      append.registry(
-        dataset.name = paste0('th_grid_csv_', run.years[y]),
-        file.name = th.area.grid.csv.file,
-        registry.file = registry.file,
-        input.dates = file.dates,
-        mount.dir = mount.dir,
-        sub.dir = paste0(sub.dir, 'thermal_habitat_gridded/')
-      )
-    } else {
-      message(
-        'thermal_habitat_area_',
-        run.years[y],
-        ' already exists but input files have changed. Overwriting with new data. No registry Change'
-      )
-    }
-  }
+  # # #Make thermal_habitat_gridded----
+  # print(paste0(
+  #   'Starting thermal_habitat_gridded for year: ',
+  #   run.years[y],
+  #   ' at ',
+  #   Sys.time()
+  # ))
+  # 
+  # th.grid.prefix <- 'GLORYS_thermal_habitat_gridded_'
+  # th.grid.file <- paste0(
+  #   mount.dir,
+  #   sub.dir,
+  #   '/thermal_habitat_gridded/',
+  #   th.grid.prefix,
+  #   run.years[y],
+  #   '.nc'
+  # )
+  # check.dir(th.grid.file)
+  # 
+  # th.grid.check <- check.date.file(
+  #   registry.file,
+  #   dataset.name = paste0('th_grid_', run.years[y]),
+  #   input.dates = file.dates,
+  #   mount.dir = mount.dir
+  # )
+  # 
+  # if (th.grid.check$file.exists & th.grid.check$same.input.date) {
+  #   message(
+  #     'thermal_habitat_gridded_',
+  #     run.years[y],
+  #     ' already exists and is up to date. Skipping.'
+  #   )
+  #   th.grid.file <- get_recent_file(
+  #     registry.file,
+  #     dataset.name = paste0('th_grid_', run.years[y])
+  #   )
+  # } else if (!th.grid.check$same.input.date | !th.grid.check$file.exists) {
+  #   EDAB.GLORYS::make_thermal_habitat_gridded(
+  #     input.file = this.year.files,
+  #     output.file = th.grid.file,
+  #     supp.dir = supp.dir,
+  #     shp.file = shp.file,
+  #     file.year = run.years[y],
+  #     write.out = T,
+  #     # t.max.seq = c(0,1)
+  #     t.max.seq = seq(0, 30, 1)
+  #   )
+  # 
+  #   # write.csv(th.grid.df, th.grid.file, row.names = F)
+  #   if (!th.grid.check$same.run.date) {
+  #     append.registry(
+  #       dataset.name = paste0('th_grid_', run.years[y]),
+  #       file.name = th.grid.file,
+  #       registry.file = registry.file,
+  #       input.dates = file.dates,
+  #       mount.dir = mount.dir,
+  #       sub.dir = paste0(sub.dir, 'thermal_habitat_gridded/')
+  #     )
+  #   } else {
+  #     message(
+  #       'thermal_habitat_gridded_',
+  #       run.years[y],
+  #       ' already exists but input files have changed. Overwriting with new data. No registry Change'
+  #     )
+  #   }
+  # }
+  # 
+  # # #Make thermal_habitat_area----
+  # print(paste0(
+  #   'Starting thermal_habitat_area for year: ',
+  #   run.years[y],
+  #   ' at ',
+  #   Sys.time()
+  # ))
+  # 
+  # th.area.prefix <- 'GLORYS_thermal_habitat_area_'
+  # th.grid.csv.prefix <- 'GLORYS_thermal_habitat_gridded_'
+  # th.area.file <- paste0(
+  #   mount.dir,
+  #   sub.dir,
+  #   '/thermal_habitat_area/',
+  #   th.area.prefix,
+  #   run.years[y],
+  #   '.csv'
+  # )
+  # th.area.grid.csv.file <- paste0(
+  #   mount.dir,
+  #   sub.dir,
+  #   '/thermal_habitat_gridded/',
+  #   th.grid.csv.prefix,
+  #   run.years[y],
+  #   '.csv'
+  # )
+  # check.dir(th.area.file)
+  # check.dir(th.area.grid.csv.file)
+  # 
+  # th.area.check <- check.date.file(
+  #   registry.file,
+  #   dataset.name = paste0('th_area_', run.years[y]),
+  #   input.dates = file.dates,
+  #   mount.dir = mount.dir
+  # )
+  # 
+  # if (th.area.check$file.exists & th.area.check$same.input.date) {
+  #   message(
+  #     'thermal_habitat_area_',
+  #     run.years[y],
+  #     ' already exists and is up to date. Skipping.'
+  #   )
+  #   th.area.file <- get_recent_file(
+  #     registry.file,
+  #     dataset.name = paste0('th_area_', run.years[y])
+  #   )
+  #   th.area.grid.csv.file <- get_recent_file(
+  #     registry.file,
+  #     dataset.name = paste0('th_grid_csv_', run.years[y])
+  #   )
+  # } else if (!th.area.check$same.input.date | !th.area.check$file.exists) {
+  #   th.area.df <- EDAB.GLORYS::make_thermal_habitat_area(
+  #     input.file = this.year.files,
+  #     output.file.area = th.area.file,
+  #     output.file.gridded = th.area.grid.csv.file,
+  #     shp.file = shp.file,
+  #     file.year = run.years[y],
+  #     write.area = F,
+  #     write.gridded = F,
+  #     t.max.seq = seq(0, 30, 1)
+  #     # t.max.seq = c(0,1)
+  #   )
+  # 
+  #   write.csv(th.area.df$thermal.area, th.area.file, row.names = F)
+  #   write.csv(th.area.df$thermal.gridded, th.area.grid.csv.file, row.names = F)
+  # 
+  #   if (!th.area.check$same.run.date) {
+  #     append.registry(
+  #       dataset.name = paste0('th_area_', run.years[y]),
+  #       file.name = th.area.file,
+  #       registry.file = registry.file,
+  #       input.dates = file.dates,
+  #       mount.dir = mount.dir,
+  #       sub.dir = paste0(sub.dir, 'thermal_habitat_area/')
+  #     )
+  #     append.registry(
+  #       dataset.name = paste0('th_grid_csv_', run.years[y]),
+  #       file.name = th.area.grid.csv.file,
+  #       registry.file = registry.file,
+  #       input.dates = file.dates,
+  #       mount.dir = mount.dir,
+  #       sub.dir = paste0(sub.dir, 'thermal_habitat_gridded/')
+  #     )
+  #   } else {
+  #     message(
+  #       'thermal_habitat_area_',
+  #       run.years[y],
+  #       ' already exists but input files have changed. Overwriting with new data. No registry Change'
+  #     )
+  #   }
+  # }
 
   #Make cold_pool_raw----
   print(paste0(

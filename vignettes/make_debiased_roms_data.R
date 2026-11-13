@@ -14,8 +14,16 @@ if(file.exists(output.roms)){
   roms.crop = terra::mask(terra::crop(roms.rast, shp.vect),shp.vect)
   roms.names = terra::names(roms.crop)
   
-  roms.day = as.numeric(sub('^[^0-9]+([0-9]+).*', '\\1', roms.names))
-  roms.year = as.numeric(sub('.*=([0-9]{4})$', '\\1', roms.names))
+  # roms.day = as.numeric(sub('^[^0-9]+([0-9]+).*', '\\1', roms.names))
+  # roms.year = as.numeric(sub('.*=([0-9]{4})$', '\\1', roms.names))
+  roms.times <- strcapture(
+    pattern = "year=(\\d{4})_(\\d+)", 
+    x = roms.names, 
+    proto = list(year = integer(), doy = integer())
+  )
+  roms.year = roms.times[,1]
+  roms.day = roms.times[,2]
+  
   roms.date = as.Date(paste(roms.year, roms.day), format = "%Y %j")
   
   date.keep = which(!is.na(roms.date))
@@ -39,9 +47,9 @@ if(file.exists(output.roms)){
       this.data.rast = EDABUtilities::make_2d_summary_gridded(data.in = roms.this.y,
                                                               write.out =F,
                                                               shp.file = shp.file,
-                                                              var.name = 'bottomT',
+                                                              var.name = 'sea_water_temperature_at_sea_floor',
                                                               agg.time = 'days',
-                                                              statistic = 'mean',
+                                                              statistics = 'mean',
                                                               touches =F,
                                                               file.time = 'annual',
                                                               area.names = epu.names[i]
@@ -67,6 +75,6 @@ if(file.exists(output.roms)){
     dplyr::mutate(Source = 'ROMS') |> 
     dplyr::rename(date = 'time')
   sort(unique(format(as.Date(data.all$date),format = '%Y')))
-  write.csv(data.all, '/home/jcaracappa/EDAB_Dev/jcaracappa/ROMS_NWA/ROMS_daily_epu_1959_1992.csv', row.names =F)
+  write.csv(data.all, '/home/jcaracappa/EDAB_Resources/static_workflow_inputs/ROMS_daily_epu_1959_1992.csv', row.names =F)
 
 }

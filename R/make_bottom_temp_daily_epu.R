@@ -14,8 +14,7 @@
 #' @export
 #'
 
-input.file <-
-  make_bottom_temp_daily_epu <- function(
+make_bottom_temp_daily_epu <- function(
   input.file,
   output.file,
   shp.file,
