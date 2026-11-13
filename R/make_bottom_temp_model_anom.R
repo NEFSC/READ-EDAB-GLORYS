@@ -35,7 +35,8 @@ make_bottom_temp_model_anom = function(input.file,
                                                         shp.file = shp.file,
                                                         var.name = 'bottomT',
                                                         agg.time = 'season',
-                                                        statistic = 'mean',
+                                                        statistics.spatial = 'mean',
+                                                        statistic.temporal = 'mean',
                                                         touches =F,
                                                         file.time = 'daily',
                                                         area.names = c('MAB','GB','GOM','SS')
@@ -52,13 +53,13 @@ make_bottom_temp_model_anom = function(input.file,
     dplyr::rename(Source = 'Var')|>
     dplyr::mutate(value.anom = value-value.clim)|>
     dplyr::left_join(season.match,by = c('time'= 'season.id')) |>
-    dplyr::mutate(dum = '_Bottom Temp Anomaly')|>
-    tidyr::unite(Var,c('season.name','dum'),sep='')|>
+    dplyr::mutate(dum = 'Bottom Temp Anomaly_')|>
+    tidyr::unite(Var,c('dum','season.name'),sep='')|>
     dplyr::rename(Time = 'year',
            EPU = 'area',
            Value = 'value.anom')|>
     dplyr::mutate(Units = 'degree C')|>
-    dplyr::select(Time, Value, EPU, Source, Var, Units)
+    dplyr::select(Time, EPU, Var, Value, Units, Source)
   
   if(write.out){
     write.csv(data.all.anom,output.file,row.names = F)

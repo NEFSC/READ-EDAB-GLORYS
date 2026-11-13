@@ -219,7 +219,7 @@ if (season.clim.check$same.input.date & season.clim.check$file.exists) {
     registry.file,
     dataset.name = 'seasonal_climatology'
   )
-} else if (!season.clim.check$same.input.date) {
+} else if (!season.clim.check$same.input.date | !season.clim.check$file.exists) {
   season.clim.df <- EDAB.GLORYS::make_gridded_climatology(
     input.dir = glorys.in.dir,
     input.prefix = glorys.prefix,
@@ -271,7 +271,7 @@ if (annual.clim.check$same.input.date & annual.clim.check$file.exists) {
     registry.file,
     dataset.name = 'annual_climatology'
   )
-} else if (!annual.clim.check$same.input.date) {
+} else if (!annual.clim.check$same.input.date | !annual.clim.check$file.exists) {
   annual.clim.df <- EDAB.GLORYS::make_gridded_climatology(
     input.dir = glorys.in.dir,
     input.prefix = glorys.prefix,
@@ -442,7 +442,8 @@ for (y in 1:length(run.years)) {
       file.year = run.years[y],
       climatology.file = season.clim.file,
       write.out = F
-    )
+    ) |> 
+      dplyr::mutate(Var = paste0(Var,'_GLORYS'))
 
     write.csv(bt.anom.df, bt.anom.file, row.names = F)
     if (!bt.anom.check$same.run.date) {
@@ -507,7 +508,8 @@ for (y in 1:length(run.years)) {
       file.year = run.years[y],
       climatology.file = annual.clim.file,
       write.out = F
-    )
+    ) |> 
+      dplyr::mutate(Var = paste0(Var,'_GLORYS'))
 
     write.csv(bt.annual.df, bt.annual.file, row.names = F)
     if (!bt.annual.check$same.run.date) {
@@ -629,17 +631,18 @@ for (y in 1:length(run.years)) {
       dataset.name = paste0('th_grid_', run.years[y])
     )
   } else if (!th.grid.check$same.input.date | !th.grid.check$file.exists) {
-    th.grid.df <- EDAB.GLORYS::make_thermal_habitat_gridded(
+    EDAB.GLORYS::make_thermal_habitat_gridded(
       input.file = this.year.files,
       output.file = th.grid.file,
       supp.dir = supp.dir,
       shp.file = shp.file,
       file.year = run.years[y],
-      write.out = F,
-      t.max.seq = seq(0, 1, 1)
+      write.out = T,
+      # t.max.seq = c(0,1)
+      t.max.seq = seq(0, 30, 1)
     )
 
-    write.csv(th.grid.df, th.grid.file, row.names = F)
+    # write.csv(th.grid.df, th.grid.file, row.names = F)
     if (!th.grid.check$same.run.date) {
       append.registry(
         dataset.name = paste0('th_grid_', run.years[y]),
@@ -717,7 +720,8 @@ for (y in 1:length(run.years)) {
       file.year = run.years[y],
       write.area = F,
       write.gridded = F,
-      t.max.seq = seq(0, 1, 1)
+      t.max.seq = seq(0, 30, 1)
+      # t.max.seq = c(0,1)
     )
 
     write.csv(th.area.df$thermal.area, th.area.file, row.names = F)
@@ -810,7 +814,7 @@ for (y in 1:length(run.years)) {
 
     write.csv(cp.raw.df$data.frame, cp.raw.file, row.names = F)
     terra::writeCDF(
-      cp.raw.df$data.nc[[1]],
+      cp.raw.df$data.nc,
       varname = 'BottomT',
       filename = cp.raw.nc.file,
       overwrite = T
@@ -872,7 +876,7 @@ if (flag.cold.pool) {
 
   cp.data.all <- dplyr::bind_rows(glorys.cp.data, roms.cp.data)
 
-  cp.ind.dir <- paste0(sub.dir, '/cold_pool_indices/')
+  cp.ind.dir <- paste0(mount.dir,sub.dir, '/cold_pool_indices/')
   if (!dir.exists(cp.ind.dir)) {
     dir.create(cp.ind.dir)
   }
@@ -954,20 +958,104 @@ soe_combine <- function(
       recent.dataset.df <- dplyr::bind_rows(recent.dataset.df, roms.df)
     }
   }
-  data.dates <- as.Date(recent.dataset.df$date)
-
-  start.date <- min(data.dates)
-  end.date <- max(data.dates)
-
-  out.name <- paste0(
-    output.prefix,
-    '_',
-    format(start.date, '%Y%m%d'),
-    '_',
-    format(end.date, '%Y%m%d'),
-    '.csv'
-  )
-
+  
+  if('date' %in% colnames(recent.dataset.df)){
+    data.time <- as.Date(recent.dataset.df$date)  
+    
+    start.date <- min(data.time,na.rm=T)
+    end.date <- max(data.time,na.rm=T)
+    
+    out.name <- paste0(
+      output.prefix,
+      '_',
+      format(start.date, '%Y-%m-%d'),
+      '_',
+      format(end.date, '%Y-%m-%d'),
+      '.csv'
+    )
+    
+    
+  }else if('Time' %in% colnames(recent.dataset.df)){
+    data.time <- recent.dataset.df$Time
+    
+    start.date <- min(data.time,na.rm=T)
+    end.date <- max(data.time,na.rm=T)
+    
+    out.name <- paste0(
+      output.prefix,
+      '_',
+      start.date,
+      '_',
+      end.date,
+      '.csv'
+    )
+    
+  }else{
+    stop('Unexpected Time/Data column name')
+  }
+  
+ 
   write.csv(recent.dataset.df, file.path(soe_dir, out.name), row.names = F)
 }
- 
+
+#bottom_temp_daily_epu
+soe_combine(
+  output.dataset <- 'bt_epu',
+  registry.file,
+  soe_dir,
+  output.prefix = 'GLORYS_bottom_temp_daily_epu',
+  roms.file = file.path(
+    supp.dir,
+    'static_workflow_inputs',
+    'ROMS_daily_epu_1959_1992.csv'
+  )
+)
+
+
+#bottom_temp_model_annual
+soe_combine(
+  output.dataset <- 'bt_annual',
+  registry.file,
+  soe_dir,
+  output.prefix = 'GLORYS_bottom_temp_model_annual'
+)
+
+
+#bottom_temp_model_anom
+soe_combine(
+  output.dataset <- 'bt_anom',
+  registry.file,
+  soe_dir,
+  output.prefix = 'GLORYS_bottom_temp_model_anom'
+)
+
+#bottom_temp_gridded
+soe_combine(
+  output.dataset <- 'bt_gridded',
+  registry.file,
+  soe_dir,
+  output.prefix = 'GLORYS_bottom_temp_model_gridded'
+)
+
+#thermal_habitat_area
+soe_combine(
+  output.dataset <- 'th_area',
+  registry.file,
+  soe_dir,
+  output.prefix = 'GLORYS_thermal_habitat_area'
+)
+
+#thermal_habitat_gridded
+soe_combine(
+  output.dataset <- 'th_grid_csv',
+  registry.file,
+  soe_dir,
+  output.prefix = 'GLORYS_thermal_habitat_gridded'
+)
+
+#cold_pool
+cp.ext.soe.file = get_recent_file(registry.file,dataset.name = 'coldpool_annual_ext_')
+file.copy(cp.ext.soe.file, paste0(soe_dir,basename(cp.ext.soe.file)),overwrite = T)
+
+cp.ind.soe.file = get_recent_file(registry.file,dataset.name = 'coldpool_index_')
+file.copy(cp.ind.soe.file, paste0(soe_dir,basename(cp.ind.soe.file)),overwrite = T)

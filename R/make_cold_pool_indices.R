@@ -153,8 +153,22 @@ make_cold_pool_indices = function(input.data, cp.extent.file,output.dir){
     dplyr::inner_join(dplyr::select(dt_extent_index_soe,year,extent_index,se_extent_index), by="year") |>
     dplyr::select(year,cold_pool_index,se_cold_pool_index,persistence_index,se_persistence_index,extent_index,se_extent_index)
   
+  dt_cp_out = dt_cp |> 
+    dplyr::rename(`Cold Pool Index` = 'cold_pool_index',
+                  `Cold Pool Index SE` = 'se_cold_pool_index',
+                  `Persistence Index` = 'persistence_index',
+                  `Persistence Index SE` = 'se_persistence_index',
+                  `Extent Index` = 'extent_index',
+                  `Extent Index SE` = 'se_extent_index',
+                  Time = 'year') |> 
+    tidyr::pivot_longer(-Time,names_to = 'Var',values_to = 'Value') |> 
+    dplyr::mutate(Source = ifelse(Time < 1993, 'ROMS','GLORYS'),
+                  Var = paste0(Var,'_',Source),
+                  EPU = 'MAB') |> 
+    dplyr::select(Time,EPU,Var,Value,Source)
+  
   cp.index.file = paste0(output.dir,"cold_pool_indices_",year.min,"_",year.max,".csv")
-  write.csv(file=cp.index.file,x=dt_cp)
+  write.csv(file=cp.index.file,x=dt_cp_out,row.names = F)
 
   out.ls = list(cp.index.file = cp.index.file,
                 year.start = year.min,

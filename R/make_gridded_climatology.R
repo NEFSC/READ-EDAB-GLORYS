@@ -58,7 +58,8 @@ make_gridded_climatology = function(input.dir,
                                                           shp.file =shp.file,
                                                           var.name = var.name,
                                                           agg.time = agg.time,
-                                                          statistic = 'mean',
+                                                          statistics.spatial = 'mean',
+                                                          statistic.temporal = 'mean',
                                                           touches =F,
                                                           area.names = c('MAB','GB','GOM','SS')
     )
