@@ -1017,7 +1017,11 @@ soe_combine(
   output.dataset <- 'bt_annual',
   registry.file,
   soe_dir,
-  output.prefix = 'GLORYS_bottom_temp_model_annual'
+  output.prefix = 'GLORYS_bottom_temp_model_annual',
+  roms.file = file.path(
+    input.dir, 
+    'ROMS_NWA/roms_bottomT_annual.csv'
+  )
 )
 
 

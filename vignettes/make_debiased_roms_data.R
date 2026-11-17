@@ -14,8 +14,16 @@ if (file.exists(output.roms)) {
   roms.crop <- terra::mask(terra::crop(roms.rast, shp.vect), shp.vect)
   roms.names <- terra::names(roms.crop)
 
-  roms.day <- as.numeric(sub('^[^0-9]+([0-9]+).*', '\\1', roms.names))
-  roms.year <- as.numeric(sub('.*=([0-9]{4})$', '\\1', roms.names))
+  roms.date.str <- strcapture(
+    pattern = "year=(\\d{4})_(\\d+)", 
+    x = roms.names, 
+    proto = list(year = integer(), doy = integer())
+  )
+  roms.day = roms.date.str[,2]
+  roms.year = roms.date.str[,1]
+  
+  # roms.day <- as.numeric(sub('^[^0-9]+([0-9]+).*', '\\1', roms.names))
+  # roms.year <- as.numeric(sub('.*=([0-9]{4})$', '\\1', roms.names))
   roms.date <- as.Date(paste(roms.year, roms.day), format = "%Y %j")
 
   date.keep <- which(!is.na(roms.date))
@@ -40,8 +48,8 @@ if (file.exists(output.roms)) {
         data.in = roms.this.y,
         write.out = F,
         shp.file = shp.file,
-        var.name = 'bottomT',
-        agg.time = terra::time(roms.this.y),
+        var.name = 'sea_water_temperature_at_sea_floor',
+        agg.time = 'days',
         statistics = 'mean',
         touches = F,
         file.time = 'annual',
@@ -49,8 +57,12 @@ if (file.exists(output.roms)) {
       )
       out.epu.ls <- list()
       for (j in 1:length(this.data.rast)) {
-        out.epu.ls[[j]] <- terra::as.data.frame(
-          terra::rast(this.data.rast[j][[1]]),
+        
+        temp.rast = terra::rast(this.data.rast[j][[1]])
+        terra::time(temp.rast) = terra::time(roms.this.y)
+        
+        out.epu.ls[[j]] B<- terra::as.data.frame(
+          temp.rast,
           xy = T,
           time = T,
           wide = F
@@ -72,7 +84,7 @@ if (file.exists(output.roms)) {
   }
   
   data.all = bind_rows(data.all.ls) |> 
-    dplyr::mutate(Source = 'ROMS') |> 
+    dplyr::mutate(source = 'ROMS') |> 
     dplyr::rename(date = 'time')
   sort(unique(format(as.Date(data.all$date),format = '%Y')))
   write.csv(data.all, '/home/jcaracappa/EDAB_Resources/static_workflow_inputs/ROMS_daily_epu_1959_1992.csv', row.names =F)
